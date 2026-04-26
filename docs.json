@@ -1,26 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "Dench",
-  "theme": "luma",
   "logo": {
     "light": "/images/dench-icon.png",
     "dark": "/images/dench-icon.png"
   },
   "favicon": "/images/dench-icon.png",
-  "appearance": {
-    "strict": true
-  },
-  "colors": {
-    "primary": "#206199",
-    "light": "#206199",
-    "dark": "#206199"
-  },
-  "background": {
-    "color": {
-      "light": "#206199",
-      "dark": "#206199"
-    }
-  },
   "navbar": {
     "primary": {
       "type": "github",
