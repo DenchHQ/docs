@@ -61,5 +61,15 @@
         ]
       }
     ]
-  }
+  },
+  "redirects": [
+    {
+      "source": "/SKILL",
+      "destination": "/skill"
+    },
+    {
+      "source": "/SKILL.md",
+      "destination": "/skill.md"
+    }
+  ]
 }
