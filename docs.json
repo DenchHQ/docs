@@ -1,9 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "Dench",
-  "theme": "mint",
+  "theme": "luma",
   "colors": {
-    "primary": "#206199"
+    "primary": "#040404",
+    "light": "#7c7474",
+    "dark": "#272625"
   },
   "logo": {
     "light": "/images/dench-icon.png",
