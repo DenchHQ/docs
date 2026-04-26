@@ -2,11 +2,15 @@
   "$schema": "https://mintlify.com/docs.json",
   "name": "Dench",
   "theme": "luma",
-  "favicon": "https://media.brand.dev/48fcdb75-d9e2-430c-b5de-013eb33ba53f.png",
+  "logo": {
+    "light": "/images/dench-icon.png",
+    "dark": "/images/dench-icon.png"
+  },
+  "favicon": "/images/dench-icon.png",
   "colors": {
-    "primary": "#040404",
-    "light": "#7c7474",
-    "dark": "#272625"
+    "primary": "#0F6B8A",
+    "light": "#EAF8FB",
+    "dark": "#082F49"
   },
   "navbar": {
     "primary": {
