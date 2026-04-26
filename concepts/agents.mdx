@@ -7,17 +7,7 @@ An agent is a named session that represents an AI worker in your Dench workspace
 
 ## Agent kinds
 
-Dench supports the following agent kinds. Use `--kind` when logging in to set the correct label.
-
-| Kind | Display name |
-|---|---|
-| `claude_code` | Claude Code Agent |
-| `codex` | Codex Agent |
-| `cursor` | Cursor Agent |
-| `hermes` | Hermes Agent |
-| `other` | Agent |
-
-If your agent type is not listed, use `--kind other`.
+`--kind` accepts any string. Common values: `claude_code`, `codex`, `cursor`, `hermes`, `openclaw`. Custom strings like `aider`, `goose`, or `some_custom_agent` are also accepted. Defaults to `other` if omitted. Normalized to lowercase snake_case.
 
 ## Logging in and creating an agent
 
