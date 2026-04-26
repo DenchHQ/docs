@@ -12,6 +12,12 @@
     "light": "#EAF8FB",
     "dark": "#082F49"
   },
+  "background": {
+    "color": {
+      "light": "#DDF3F7",
+      "dark": "#082F49"
+    }
+  },
   "navbar": {
     "primary": {
       "type": "github",
