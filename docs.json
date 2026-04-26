@@ -42,7 +42,7 @@
             ]
           },
           {
-            "group": "Core Concepts",
+            "group": "Concepts",
             "pages": [
               "concepts/tasks",
               "concepts/context",
@@ -51,7 +51,7 @@
             ]
           },
           {
-            "group": "CLI Reference",
+            "group": "CLI",
             "pages": [
               "cli/overview",
               "cli/login",
