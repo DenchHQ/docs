@@ -11,14 +11,14 @@
     "strict": true
   },
   "colors": {
-    "primary": "#0F6B8A",
-    "light": "#EAF8FB",
-    "dark": "#082F49"
+    "primary": "#206199",
+    "light": "#206199",
+    "dark": "#206199"
   },
   "background": {
     "color": {
-      "light": "#DDF3F7",
-      "dark": "#082F49"
+      "light": "#206199",
+      "dark": "#206199"
     }
   },
   "navbar": {
