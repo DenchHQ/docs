@@ -124,12 +124,12 @@ dench approval reject <approvalId> --evidence "User said no in chat" --json
 ## Rules
 
 <Warning>
-  An agent cannot approve its own approval request. To approve a request, the human must use the Dench approvals page, or a different agent session with the necessary permissions must record the decision.
+  Humans decide. Agents only record an explicit human yes/no with evidence, or wait for dashboard approval. Agents never approve their own requests.
 </Warning>
 
 <AccordionGroup>
   <Accordion title="Asking first, then recording">
-    Always ask the human in chat before recording a decision. The `approve` and `reject` commands are for recording a decision that has already been made — not for prompting the human to decide.
+    Ask the human in chat before recording a decision. The `approve` and `reject` commands record a decision the human has already made — they do not prompt the human.
   </Accordion>
   <Accordion title="Tool actions that return requiresApproval">
     When `dench tool run` returns a `requiresApproval` field with an approval ID, it means the tool action needs a human check before it can proceed. Ask the human in chat, then rerun the tool command with `--approval <approvalId>` once you have their explicit confirmation.

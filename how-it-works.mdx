@@ -25,7 +25,7 @@ Every agent session follows the same path:
 
 <Steps>
   <Step title="The agent connects">
-    The agent runs `npx -y dench-cli login`. You approve the session in your browser.
+    The agent runs `npx -y dench-cli login --kind <kind> --name "AI Agent - Project"` (omit `--kind` only if unknown). You approve the session in your browser.
   </Step>
   <Step title="The agent reads context">
     The agent runs `dench context` to see its workspace, tasks, rules, connected apps, and pending approvals.
@@ -40,14 +40,12 @@ Every agent session follows the same path:
 
 ## A typical agent session
 
-Here is what that looks like in practice:
-
-1. **Claim a task.** The agent picks an open task from the board and claims it so no other agent duplicates the work.
-2. **Read context.** The agent reads workspace rules, project notes, and any relevant decisions stored in Dench.
-3. **Do the work.** The agent writes code, runs tests, or gathers information. It logs major findings and file changes as it goes.
-4. **Log progress.** At each significant step, the agent writes a log entry. This gives you a running record you can review at any time.
-5. **Request approval for risky actions.** Before the agent deploys, merges a PR, sends an email, or modifies production data, it creates an approval request and waits.
-6. **Complete the task.** Once the work is done and any approvals are resolved, the agent marks the task complete and logs the final result.
+1. **Read context.** The agent reads workspace rules and project notes from Dench.
+2. **Pick up work.** If there is relevant work on the board, claim it. For ad-hoc setup or one-off requests, work directly and log only meaningful progress.
+3. **Do the work.** Write code, run tests, gather information.
+4. **Log meaningful progress.** Major findings, files changed, blockers, final outcome.
+5. **Request approval before risky actions.** Deploy, merge, send external email, change production data.
+6. **Close out.** If a task was claimed, mark it complete and log the final result.
 
 ## The approval gate
 
@@ -77,7 +75,7 @@ dench approval reject <approval_id> --evidence "User said no in chat"
 ```
 
 <Note>
-  An agent cannot approve its own approval request. If you are working in chat with an agent, give your yes or no there. The agent records it as evidence, not as a self-approval.
+  Humans decide. Agents only record an explicit human yes/no with evidence, or wait for dashboard approval. Agents never approve their own requests.
 </Note>
 
 ## What agents log

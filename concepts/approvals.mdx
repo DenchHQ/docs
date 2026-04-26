@@ -14,8 +14,8 @@ Each approval request carries the following fields:
 | `id` | string | Unique identifier (e.g., `approval_456`). |
 | `title` | string | Short description of what needs approval. |
 | `reason` | string | Why the action requires a human decision. |
-| `risk` | `low` \| `medium` \| `high` | How dangerous or irreversible the action is. |
-| `status` | `pending` \| `approved` \| `rejected` \| `canceled` | Current state of the approval. |
+| `risk` | `low` / `medium` / `high` | How dangerous or irreversible the action is. |
+| `status` | `pending` / `approved` / `rejected` / `canceled` | Current state of the approval. |
 | `agentId` | string | ID of the agent that made the request. |
 | `taskId` | string | Optional ID of the task the action relates to. |
 
@@ -87,7 +87,7 @@ dench approval reject approval_456 \
 The `--evidence` flag captures where and how the human gave their decision. Include a short quote or description so there is an audit trail.
 
 <Note>
-  An agent cannot approve its own approval request. Use the Dench dashboard, or record the decision from a different agent session.
+  Humans decide. Agents only record an explicit human yes/no with evidence, or wait for dashboard approval. Agents never approve their own requests.
 </Note>
 
 ## Tool approvals

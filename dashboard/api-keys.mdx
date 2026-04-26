@@ -1,152 +1,66 @@
 ---
 title: "API Keys"
-description: "Create, reveal, rotate, and revoke gateway API keys that give agents and tools access to your Dench workspace gateway from the API Keys settings page."
+description: "Create, reveal, rotate, and revoke gateway API keys for your Dench workspace."
 ---
 
-Gateway API keys are how agents and external tools authenticate with your Dench workspace gateway. Every workspace has a built-in primary sandbox key, and you can create additional keys for separate environments or integrations. Go to **Settings → API Keys** to manage all keys for your workspace.
+Gateway API keys are how agents and external tools authenticate with your Dench workspace gateway. Manage them at **Settings → API Keys**.
 
-## Key types
+Every workspace has a built-in primary sandbox key and supports additional keys you create for separate environments or integrations.
 
-<CardGroup cols={2}>
-  <Card title="Primary sandbox key" icon="key">
-    Auto-created when your workspace is provisioned. Used by the cloud sandbox and the Dench desktop app. Can be revealed, rotated, and viewed for usage, but not deleted.
-  </Card>
-  <Card title="Additional gateway keys" icon="plus">
-    Keys you create for specific integrations, CI/CD pipelines, or separate environments. Each key has a name you choose, and can be revoked when no longer needed.
-  </Card>
-</CardGroup>
+## Create
 
-## Primary sandbox key
-
-The primary sandbox key is always present. You can reveal the full value, rotate it, or view usage — all from the key card at the top of the API Keys page.
-
-The card shows:
-- A masked version of the key in the format `prefix•••••••••••••••••••••••••••••last4`
-- **Scopes** — the permissions granted (e.g. `models:read`, `chat:completions`)
-- **Created** — how long ago the key was provisioned
-- **Last used** — when the key was last used to make a request
-
-### Revealing the key
-
-The full key value is hidden by default. To see it:
-
-<Steps>
-  <Step title="Click Reveal">
-    Click the **Reveal** button on the primary key card. The dashboard fetches the full key value and displays it in place of the masked version.
-  </Step>
-  <Step title="Copy the key immediately">
-    Copy the key before navigating away or closing the session. The value is shown once per reveal action. Use the **Copy** button to copy to your clipboard.
-  </Step>
-  <Step title="Store it securely">
-    Paste the key into your secrets manager, environment variables, or tool configuration. Do not store it in source code or share it in chat.
-  </Step>
-</Steps>
-
-<Warning>
-  Only workspace admins can reveal the primary sandbox key. If the reveal button is not available, ask a workspace admin to retrieve it.
-</Warning>
-
-### Rotating the key
-
-Rotating issues a new key, updates the sandbox secrets automatically, and revokes the old key. Use rotation if you suspect the key has been exposed, or as a regular security practice.
-
-<Steps>
-  <Step title="Click Rotate key">
-    Click **Rotate key** on the primary key card. A confirmation dialog appears with the message: "Rotate the primary sandbox key? This will issue a new key, update sandbox secrets, and revoke the old key."
-  </Step>
-  <Step title="Confirm the rotation">
-    Click **OK** to proceed. The old key is revoked immediately.
-  </Step>
-  <Step title="Reveal and copy the new key">
-    After rotation completes, reveal the new key and copy it. Update any integrations or agents that were using the old key.
-  </Step>
-</Steps>
-
-<Warning>
-  Rotation briefly interrupts gateway access while the new key propagates. Plan rotations during low-traffic periods if your agents are actively running.
-</Warning>
-
-## Additional gateway keys
-
-Use additional keys to give specific integrations or environments their own credentials, so you can revoke access to one without affecting others.
-
-### Creating a key
-
-<Steps>
-  <Step title="Click Create key">
-    Click **Create key** in the **Additional Gateway Keys** section.
-  </Step>
-  <Step title="Name the key">
-    Enter a descriptive name such as `Production`, `CI/CD`, or `Development`. The name helps you identify the key later. Click **Create key** to generate it.
-  </Step>
-  <Step title="Copy the key immediately">
-    The full key value appears once in the creation dialog. Copy it now — the dashboard will never show the full value again after you close this dialog.
-  </Step>
-</Steps>
-
-<Note>
-  After creation, the key table shows only the prefix and last four characters (for example, `dg_live_...ab12`). This lets you identify which key is which without exposing the full value.
-</Note>
-
-### Revoking a key
-
-Revoking a key permanently removes its access to the gateway. Any agent or tool using that key will stop working immediately.
-
-<Steps>
-  <Step title="Open the key menu">
-    In the **Additional Gateway Keys** table, click the menu icon (⋯) on the row for the key you want to revoke.
-  </Step>
-  <Step title="Click Revoke key">
-    Select **Revoke key**. A confirmation prompt appears: "Are you sure you want to revoke this key? This action cannot be undone."
-  </Step>
-  <Step title="Confirm">
-    Click **OK** to revoke. The key's status changes to **Revoked** in the table and it can no longer be used.
-  </Step>
-</Steps>
-
-<Warning>
-  Revocation is permanent and cannot be undone. If you need access again, create a new key.
-</Warning>
-
-## Key usage tracking
-
-Each key shows its last used time in the table. To see a full usage breakdown — request counts and estimated cost over the last 30 days — click the menu icon on any key row and select **View usage**. This takes you to the usage page filtered to that key.
-
-The **Additional Gateway Keys** table columns are:
-
-| Column | Description |
-|---|---|
-| Name | The label you gave the key |
-| Key | Prefix and last 4 characters for identification |
-| Created By | The workspace member who created the key |
-| 30d Requests | Number of gateway requests in the last 30 days |
-| 30d Cost | Estimated cost for those requests |
-| Last Used | How long ago the key was last used |
-| Status | **Active** or **Revoked** |
-
-## Using your key
-
-Set the gateway key as the `DENCH_GATEWAY_KEY` environment variable wherever your agent or tool runs:
+In **Additional Gateway Keys**, click **Create key**, name it (e.g. `Production`, `CI/CD`), and click **Create key**. Copy the full value immediately — it is shown once.
 
 ```bash
 export DENCH_GATEWAY_KEY=dg_live_your_key_here
 ```
 
-You can also pass it directly as the gateway key parameter in tool integrations that support it. Check the integration's documentation for the exact parameter name.
+## Reveal
 
-## Security best practices
+The primary sandbox key is hidden by default. Click **Reveal** on the key card, then **Copy**. Only workspace admins can reveal it.
+
+## Rotate
+
+Click **Rotate key** on the primary sandbox card. This issues a new key, updates sandbox secrets, and revokes the old key. Plan rotations during low-traffic periods — gateway access briefly interrupts while the new key propagates.
+
+## Revoke
+
+In the Additional Gateway Keys table, click the menu (⋯) on the row, select **Revoke key**, and confirm. Revocation is immediate and permanent.
+
+## Never share secrets
+
+- Store keys in environment variables or a secrets manager.
+- Never commit keys to source code, even in private repos.
+- Use separate keys per environment (production, staging, dev).
+- Rotate after team changes or suspected exposure.
+
+---
+
+## Reference
 
 <AccordionGroup>
-  <Accordion title="Rotate keys regularly">
-    Rotate the primary sandbox key periodically, especially after team membership changes or if you suspect exposure. Regular rotation limits the window of risk if a key is ever leaked.
+  <Accordion title="Key types">
+    - **Primary sandbox key** — auto-created with your workspace. Used by the cloud sandbox and the Dench desktop app. Can be revealed and rotated, but not deleted.
+    - **Additional gateway keys** — keys you create for specific integrations, CI/CD, or environments. Revoke when no longer needed.
   </Accordion>
-  <Accordion title="Revoke unused keys">
-    Delete keys that are no longer in use. Each active key is a potential attack surface. Keep only the keys you actively need.
+  <Accordion title="Primary key card fields">
+    - Masked key in the format `prefix•••••••last4`
+    - **Scopes** — granted permissions (e.g. `models:read`, `chat:completions`)
+    - **Created** — provisioning time
+    - **Last used** — most recent request
   </Accordion>
-  <Accordion title="Never put keys in source code">
-    Store keys in environment variables or a secrets manager. Never commit them to a repository, even a private one. Use `.env` files locally and exclude them from version control with `.gitignore`.
+  <Accordion title="Additional Gateway Keys table columns">
+    | Column | Description |
+    |---|---|
+    | Name | The label you gave the key |
+    | Key | Prefix and last 4 characters |
+    | Created By | Workspace member who created the key |
+    | 30d Requests | Gateway requests in the last 30 days |
+    | 30d Cost | Estimated cost for those requests |
+    | Last Used | Time since last use |
+    | Status | **Active** or **Revoked** |
   </Accordion>
-  <Accordion title="Use separate keys per environment">
-    Create one key for production, one for staging, and one for local development. If a key is compromised in one environment, you can revoke it without disrupting others.
+  <Accordion title="View usage">
+    Click the menu icon on any key row and select **View usage** to see request counts and estimated cost over the last 30 days.
   </Accordion>
 </AccordionGroup>

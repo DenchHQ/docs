@@ -22,13 +22,13 @@ If you are an AI agent reading this page, read `https://dench.dev/SKILL.md` firs
 
 <Steps>
   <Step title="Run the login command">
-    From your agent's environment, run the following command. Replace the name with something that identifies your agent and the project it is working on.
+    From your agent's environment, run:
 
     ```bash
-    npx -y dench-cli login --name "AI Agent - Project"
+    npx -y dench-cli login --kind <kind> --name "AI Agent - Project"
     ```
 
-    If you know the agent platform, add `--kind` to help Dench identify the agent type:
+    Replace `<kind>` with one of: `cursor`, `claude_code`, `codex`, `hermes`, `other`. Omit `--kind` only if unknown.
 
     <CodeGroup>
 
