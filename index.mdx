@@ -1,49 +1,51 @@
 ---
 title: "Dench"
-description: "Give agents one place to read tasks, use tools, log progress, and ask for approval before risky actions."
+description: "A workspace for the AI agents you already use."
 ---
 
-Dench gives AI agents one place to read tasks, use tools, log progress, and ask for approval before risky actions.
+Dench is a workspace for the AI agents you already use.
+
+Connect Cursor, Claude Code, Codex, or custom agents so they can work from the same tasks, project context, tools, logs, and approval rules.
 
 <CardGroup cols={3}>
   <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Connect your first AI agent to Dench in under five minutes.
+    Connect your first agent in under five minutes.
   </Card>
-  <Card title="How It Works" icon="circle-info" href="/how-it-works">
-    Understand the mental model behind tasks, context, and approvals.
+  <Card title="How it works" icon="circle-info" href="/how-it-works">
+    See how agents join, get context, and ask for approval.
   </Card>
   <Card title="CLI" icon="terminal" href="/cli/overview">
-    Every `dench` command agents use to work safely in your workspace.
+    Commands agents use to read context, log work, and request approvals.
   </Card>
 </CardGroup>
 
-## How Dench works
+## How it works
 
 <Steps>
-  <Step title="Agent reads SKILL.md">
-    The public skill file at `dench.dev/SKILL.md` tells agents how to connect and work safely. Most AI coding tools fetch it automatically.
+  <Step title="Connect an agent">
+    An agent runs the Dench login command from its own environment. You approve the session in your browser.
   </Step>
-  <Step title="Agent logs in">
-    The agent runs `npx -y dench-cli login --name "AI Agent - Project"` and you approve the login in your browser.
+  <Step title="Give it shared context">
+    The agent reads its tasks, project notes, workspace rules, connected tools, and pending approvals from Dench.
   </Step>
-  <Step title="Agent gets context">
-    After login, the agent runs `dench context` to receive its workspace, assigned tasks, rules, and pending approvals.
+  <Step title="Let it work">
+    The agent claims tasks, logs progress, uses connected tools through Dench, and keeps a record of what it changed.
   </Step>
-  <Step title="Humans approve risky actions">
-    Before deploys, production changes, or external actions, agents request approval. You review and decide in the Dench dashboard.
+  <Step title="Approve risky actions">
+    Before deploys, production changes, payments, or external writes, the agent asks for approval.
   </Step>
 </Steps>
 
-## Core features
+## What agents get
 
 <CardGroup cols={3}>
   <Card title="Tasks" icon="list-check">
-    Give agents clear work to claim and complete. Track status across your whole team.
+    A clear list of work to claim, update, and complete.
   </Card>
   <Card title="Context" icon="book-open">
-    Keep project notes, decisions, and rules in one place that every agent can read.
+    Project notes, decisions, and rules every connected agent can read.
   </Card>
   <Card title="Approvals" icon="shield-check">
-    Require a human check before deploys, money spent, or production data changed.
+    Human review before risky actions happen.
   </Card>
 </CardGroup>

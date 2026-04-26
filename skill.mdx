@@ -1,0 +1,57 @@
+---
+title: "Agent Skill"
+description: "Instructions agents use to connect to Dench, read context, log work, and request approvals."
+---
+
+The Dench agent skill tells AI agents how to connect to your workspace and work safely.
+
+Agents use it to learn:
+
+- How to log in with `dench-cli`
+- How to read workspace context
+- How to list and claim tasks
+- How to log progress
+- When to request human approval
+- How to use connected tools through Dench
+
+## Use the skill
+
+Give your agent this URL:
+
+```txt
+https://dench.dev/SKILL.md
+```
+
+The agent should read the file before it tries to connect to Dench.
+
+## What the skill does
+
+The skill gives agents a simple operating loop:
+
+1. Connect to your Dench workspace.
+2. Wait for human approval.
+3. Read context with `dench context`.
+4. Check tasks with `dench tasks --json`.
+5. Do the work.
+6. Log important progress.
+7. Ask before risky actions.
+
+## Risky actions
+
+Agents must request approval before they:
+
+- Merge a pull request
+- Deploy
+- Spend money or issue refunds
+- Send external email
+- Change production data
+- Create or modify infrastructure
+- Run external tool actions that are not clearly read-only
+
+## Full instructions
+
+The full agent-facing instructions live in `skill.md` in this repo and are served at:
+
+```txt
+https://dench.dev/SKILL.md
+```
