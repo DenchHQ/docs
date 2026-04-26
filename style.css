@@ -1,0 +1,73 @@
+:root {
+  --dench-page-bg: #DDF3F7;
+  --dench-page-bg-soft: #EAF8FB;
+  --dench-accent: #0F6B8A;
+  --dench-dark-bg: #082F49;
+  --dench-surface: rgba(255, 255, 255, 0.86);
+  --dench-border: rgba(15, 107, 138, 0.18);
+  background: var(--dench-page-bg);
+}
+
+html,
+body,
+#body-content,
+#background-color {
+  background: var(--dench-page-bg) !important;
+}
+
+#content-area,
+#content,
+#header,
+#sidebar,
+#sidebar-content,
+#table-of-contents,
+#table-of-contents-layout,
+#table-of-contents-content {
+  background: transparent !important;
+}
+
+#navbar {
+  background: rgba(221, 243, 247, 0.92) !important;
+  border-bottom-color: var(--dench-border) !important;
+  backdrop-filter: blur(12px);
+}
+
+card,
+tile,
+#panel {
+  background: var(--dench-surface) !important;
+  border-color: var(--dench-border) !important;
+}
+
+#sidebar-content li[data-active],
+toc-item[data-active],
+toc-item[data-active-deepest] {
+  color: var(--dench-accent) !important;
+}
+
+html.dark,
+html.dark body,
+html.dark #body-content,
+html.dark #background-color,
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] #body-content,
+html[data-theme="dark"] #background-color {
+  background: var(--dench-dark-bg) !important;
+}
+
+html.dark #navbar,
+html[data-theme="dark"] #navbar {
+  background: rgba(8, 47, 73, 0.92) !important;
+  border-bottom-color: rgba(234, 248, 251, 0.14) !important;
+}
+
+html.dark card,
+html.dark tile,
+html.dark #panel,
+html[data-theme="dark"] card,
+html[data-theme="dark"] tile,
+html[data-theme="dark"] #panel {
+  background: rgba(15, 107, 138, 0.22) !important;
+  border-color: rgba(234, 248, 251, 0.16) !important;
+}
