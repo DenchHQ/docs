@@ -46,27 +46,6 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "DenchClaw",
-        "groups": [
-          {
-            "group": "Get Started",
-            "pages": [
-              "claw/introduction",
-              "claw/quickstart"
-            ]
-          },
-          {
-            "group": "Features",
-            "pages": [
-              "claw/database",
-              "claw/ai-chat",
-              "claw/integrations",
-              "claw/skills"
-            ]
-          }
-        ]
       }
     ]
   },
@@ -76,9 +55,7 @@
     "Human approval gates — require a human check before deploys, production changes, or risky actions",
     "dench-cli — agent-facing CLI for login, task management, logging, and approvals",
     "External tool brokering — agents run Composio-backed tools (GitHub, Slack, Gmail, Stripe, etc.) through Dench with approval enforcement",
-    "Gateway API keys — manage keys for workspace and sandbox access",
-    "DenchClaw — local-first AI CRM powered by OpenClaw, runs at localhost:3100",
-    "DenchClaw Skills Store — extend the agent with one-command skill installs"
+    "Gateway API keys — manage keys for workspace and sandbox access"
   ],
   "publicApiSurface": [
     "dench login --name <name> --kind <kind>",
@@ -98,7 +75,6 @@
     "dench tool status [toolkit]",
     "dench tool connect <toolkit>",
     "dench tool search <query>",
-    "dench tool run <composio_tool_slug> --args",
-    "npx denchclaw"
+    "dench tool run <composio_tool_slug> --args"
   ]
 }

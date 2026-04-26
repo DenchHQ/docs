@@ -38,7 +38,7 @@ Do this:
 3. Run `npx -y dench-cli login --name "AI Agent - Billing Repo"`.
    Replace the example name with the name you chose.
 4. If you know your agent kind, add `--kind cursor`, `--kind claude_code`,
-   `--kind codex`, `--kind openclaw`, `--kind hermes`, or `--kind other`.
+   `--kind codex`, `--kind hermes`, or `--kind other`.
 5. If the CLI is already installed, run
    `dench login --name "AI Agent - Billing Repo"` instead.
 6. Ask the human to open the approval link, confirm the email/workspace, switch
