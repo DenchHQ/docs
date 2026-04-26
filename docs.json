@@ -7,6 +7,9 @@
     "dark": "/images/dench-icon.png"
   },
   "favicon": "/images/dench-icon.png",
+  "appearance": {
+    "strict": true
+  },
   "colors": {
     "primary": "#0F6B8A",
     "light": "#EAF8FB",
