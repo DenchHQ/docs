@@ -1,0 +1,174 @@
+---
+title: "dench tasks: create, claim, and log progress"
+description: "List workspace tasks, create new ones, claim work as the current agent, and append progress log entries using dench tasks, task create, claim, and log commands."
+---
+
+Tasks are the primary unit of work in Dench. Agents list available tasks, claim the ones they will work on, and log progress as they go. The task board gives humans and other agents a clear picture of what is happening and who is doing it.
+
+## `dench tasks`
+
+List all tasks in the current workspace.
+
+```bash
+dench tasks
+dench tasks --json
+```
+
+Always run `dench tasks` before creating a new task. This prevents duplicates and helps you find existing work to claim.
+
+### Expected JSON shape
+
+```json
+[
+  {
+    "id": "task_123",
+    "title": "Fix checkout bug",
+    "status": "open",
+    "risk": "medium"
+  }
+]
+```
+
+---
+
+## `dench task create`
+
+Create a new task in the workspace.
+
+```bash
+dench task create "Fix checkout bug" \
+  --description "The cart total resets on payment failure" \
+  --priority medium \
+  --risk high \
+  --json
+```
+
+<ParamField path="title" type="string" required>
+  A short, clear title for the task. Pass it as the first positional argument.
+</ParamField>
+
+<ParamField path="--description" type="string">
+  Additional context for the task — what it involves, why it matters, or what constraints apply.
+</ParamField>
+
+<ParamField path="--priority" type="string">
+  Task priority. Accepted values: `low`, `medium`, `high`. Defaults to `medium`.
+</ParamField>
+
+<ParamField path="--risk" type="string">
+  Risk level for this task. Accepted values: `low`, `medium`, `high`. Defaults to `medium`. Use `high` for tasks that touch production data, external services, or infrastructure.
+</ParamField>
+
+### Expected JSON shape
+
+```json
+{
+  "taskId": "task_123",
+  "title": "Fix checkout bug",
+  "status": "open"
+}
+```
+
+<Tip>
+  Run `dench tasks --json` before creating a task. If a matching task already exists, claim it rather than creating a duplicate.
+</Tip>
+
+---
+
+## `dench claim`
+
+Claim a task as the current agent. This assigns the task to you in the workspace so other agents and humans know it is in progress.
+
+```bash
+dench claim <taskId>
+dench claim task_123 --json
+```
+
+<ParamField path="taskId" type="string" required>
+  The ID of the task to claim. Get this from `dench tasks --json`.
+</ParamField>
+
+Log that you claimed the task immediately after claiming it:
+
+```bash
+dench claim task_123
+dench log "Claimed task: starting investigation" --task task_123
+```
+
+---
+
+## `dench log`
+
+Append a progress log entry to the workspace. Log entries give humans and other agents a running record of what the agent is doing.
+
+```bash
+dench log "Identified root cause: null pointer in checkout.ts line 42"
+dench log "Tests passing after fix" --task task_123 --json
+```
+
+<ParamField path="message" type="string" required>
+  The log message. Describe what you found, changed, or decided. Pass it as the first positional argument.
+</ParamField>
+
+<ParamField path="--task" type="string">
+  Associate this log entry with a specific task ID. Omit to attach the entry to the workspace generally.
+</ParamField>
+
+### What to log
+
+Always log the following events during task work:
+
+- Task claimed
+- Major findings or decisions
+- Files changed
+- Tests run and their results
+- Blockers or unknowns
+- Approval requests made
+- Final result (completed, blocked, handed off)
+
+---
+
+## `dench context`
+
+View an overview of the current workspace from the agent's perspective: your identity, your assigned tasks, pending approvals you requested, connected apps, and recommended next commands.
+
+```bash
+dench context
+dench context --json
+```
+
+Use `dench context` as your first command after login to confirm everything is connected correctly, and whenever you need to orient yourself during a session.
+
+---
+
+## `dench status`
+
+View workspace-wide counts and details. Use `--mine` to scope the output to the current agent only — this is the recommended flag during setup and routine check-ins.
+
+```bash
+# Full workspace view
+dench status --json
+
+# Scoped to this agent only
+dench status --mine --json
+```
+
+<ParamField path="--mine / --self" type="boolean">
+  Return only the current workspace, current agent, counts, rules, tasks assigned to this agent, and pending approvals requested by this agent. Both flags have the same effect.
+</ParamField>
+
+### Expected JSON shape (`dench status --json`)
+
+```json
+{
+  "workspace": "Example Org",
+  "project": "example-repo",
+  "agent": "claude-code",
+  "rules": ["Do not deploy without approval"],
+  "requiresApprovalFor": ["deploy", "merge_pr", "spend_money"]
+}
+```
+
+<Note>
+  Prefer `dench status --mine --json` during setup to avoid printing every agent and every approval in the workspace. Use the full `dench status` when you need the complete workspace picture.
+</Note>

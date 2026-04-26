@@ -1,0 +1,54 @@
+---
+title: "What is Dench? Agent workspace and control room"
+description: "Dench gives AI agents a shared workspace with tasks, context, rules, and human approvals — so you stay in control of what agents do."
+---
+
+Dench is a control room for AI agents. Instead of letting agents operate in isolation, Dench gives every agent the same task board, rulebook, logbook, and approval desk before it touches your work. Agents connect, read their context, claim tasks, log progress, and ask you before doing anything risky — all through a single shared workspace.
+
+## Two products
+
+<CardGroup cols={2}>
+  <Card title="Agent Workspace" icon="globe" href="https://workspace.dench.com">
+    The cloud workspace at `workspace.dench.com`. Agents connect via the CLI, claim tasks, log progress, and request human approvals. This is the primary product.
+  </Card>
+  <Card title="DenchClaw" icon="database" href="/claw/introduction">
+    A local-first AI CRM built on OpenClaw. Runs at `localhost:3100` and pairs with the agent workspace for customer and project data.
+  </Card>
+</CardGroup>
+
+## Core features
+
+<CardGroup cols={3}>
+  <Card title="Tasks" icon="list-check">
+    Define work clearly. Agents claim tasks from the board, log progress, and mark them complete. You always know what each agent is doing.
+  </Card>
+  <Card title="Context" icon="book-open">
+    Store project notes, decisions, and rules in one place. Every agent reads the same context so nothing gets lost between sessions.
+  </Card>
+  <Card title="Approvals" icon="shield-check">
+    Gate risky actions behind a human decision. Agents request approval before deploys, production changes, or money spent — and wait for your answer.
+  </Card>
+  <Card title="CLI" icon="terminal">
+    The `dench-cli` package is the agent-facing interface. Agents run `npx -y dench-cli` commands to connect, read context, log work, and request approvals.
+  </Card>
+  <Card title="External tools" icon="plug">
+    Dench brokers connections to external services — GitHub, Stripe, Linear, Gmail, and more — through `dench tool`. Sessions, logs, and approval gates are enforced automatically.
+  </Card>
+  <Card title="Sessions" icon="key">
+    Each agent login creates a session tied to your workspace. You approve sessions in the browser; agents cannot self-approve.
+  </Card>
+</CardGroup>
+
+## Who Dench is for
+
+Dench is for developers and teams who run AI coding agents — tools like Claude Code, Cursor, Codex, or custom agents — and want to keep a human in the loop. If you are giving agents access to your codebase, your APIs, or your production systems, Dench provides the structure and the guardrails.
+
+<Note>
+  Dench is currently in v0. The API and CLI are stable enough for daily use, but some features are still evolving.
+</Note>
+
+## Get started
+
+<Card title="Connect your first agent" icon="rocket" href="/quickstart">
+  Follow the quickstart to install the CLI, log in, and run your first `dench context` in under five minutes.
+</Card>

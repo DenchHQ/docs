@@ -1,0 +1,111 @@
+---
+title: "Context: the agent's view of the workspace"
+description: "Learn what context contains in Dench, how agents read it, and when to use dench context versus dench status to orient an agent session."
+---
+
+Context is the agent's window into the current state of your workspace. When an agent runs `dench context`, it receives everything it needs to work effectively: who it is, what workspace it belongs to, what tasks are assigned to it, which approvals are waiting, what rules apply, and which external apps are connected. Agents should read context at the start of every session and after any significant change.
+
+## Reading context
+
+Run `dench context` for a human-readable summary, or add `--json` for machine-parseable output.
+
+<CodeGroup>
+
+```bash Human-readable
+dench context
+```
+
+```bash JSON output
+dench context --json
+```
+
+</CodeGroup>
+
+The response includes:
+
+- **Workspace name** — the organization or project the agent is working in
+- **Agent name and kind** — the agent's registered identity (e.g., `Claude Code Agent - Billing Repo`, kind `claude_code`)
+- **Assigned tasks** — tasks currently claimed by or assigned to this agent
+- **Pending approvals** — approvals that this agent has requested and that are awaiting a human decision
+- **Connected apps** — external services connected through Dench (e.g., GitHub, Stripe, Linear)
+- **Next commands** — suggested CLI commands given the current state
+
+## Example JSON output
+
+```json
+{
+  "workspace": "Example Org",
+  "agent": {
+    "name": "Claude Code Agent - Billing Repo",
+    "kind": "claude_code"
+  },
+  "assignedTasks": [
+    {
+      "id": "task_123",
+      "title": "Fix checkout bug",
+      "status": "claimed"
+    }
+  ],
+  "pendingApprovals": [],
+  "connectedApps": ["github", "stripe"],
+  "nextCommands": [
+    "dench log \"Progress update\"",
+    "dench tasks --json"
+  ]
+}
+```
+
+## Rules in context
+
+Context includes the workspace rules your agent must follow. Rules are plain-language instructions stored in the workspace and automatically surfaced to every agent. A typical rule looks like:
+
+```
+Do not deploy without approval.
+```
+
+Your agent should treat every rule as a hard constraint, not a suggestion. Rules are enforced by Dench policy and supplement the workspace-level approval requirements.
+
+## `dench context` vs `dench status`
+
+Both commands show workspace information, but they are optimized for different situations.
+
+<CardGroup cols={2}>
+  <Card title="dench context" icon="book-open">
+    The standard agent view. Use it at the start of a session and whenever you need to know your current tasks, pending approvals, and connected apps.
+  </Card>
+  <Card title="dench status" icon="circle-check">
+    A broader workspace snapshot. Use `dench status --mine --json` during initial setup to verify that login succeeded and the correct workspace and agent are selected.
+  </Card>
+</CardGroup>
+
+### When to use `dench status --mine`
+
+`dench status --mine --json` returns a scoped view focused on the current agent: the workspace, agent identity, task and approval counts, rules, tasks assigned to this agent, and approvals requested by this agent. It avoids dumping every other agent's data, which makes it the right choice during setup verification.
+
+```bash
+dench status --mine --json
+```
+
+Example response:
+
+```json
+{
+  "workspace": "Example Org",
+  "project": "billing-repo",
+  "agent": "claude-code",
+  "rules": ["Do not deploy without approval"],
+  "requiresApprovalFor": ["deploy", "merge_pr", "spend_money"]
+}
+```
+
+<Tip>
+  After `dench login`, always run `dench status --mine --json` before doing anything else. It confirms the correct workspace is selected and that the login was approved.
+</Tip>
+
+## Context and connected apps
+
+The `connectedApps` field in context output lists external services your workspace has connected through Dench. If a service you need is not listed, you can connect it with `dench tool connect <toolkit>`. See [External Tools](/cli/external-tools) for details.
+
+<Note>
+  `dench apps --json` is an alias for `dench tool status --json` and returns the same connected apps list you see in context. Use it when you need just the apps list without the rest of the context payload.
+</Note>

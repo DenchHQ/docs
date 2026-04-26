@@ -1,0 +1,133 @@
+---
+title: "Connect your first AI agent to Dench"
+description: "Connect your first AI agent to Dench in five steps: install the CLI, run dench login, approve in your browser, verify with dench context, and read tasks."
+---
+
+This guide walks you through connecting an AI agent to your Dench workspace for the first time. By the end, your agent will be logged in, verified, and able to read tasks and context from your workspace.
+
+## Prerequisites
+
+- Node.js 18 or later
+- A Dench account — sign in at [dench.dev/login](https://www.dench.dev/login)
+
+## Connect your agent
+
+<Steps>
+  <Step title="Run the login command">
+    From your agent's environment, run the following command. Replace the name with something that identifies your agent and the project it is working on.
+
+    ```bash
+    npx -y dench-cli login --name "AI Agent - Project"
+    ```
+
+    If you know the agent platform, add `--kind` to help Dench identify the agent type:
+
+    <CodeGroup>
+
+    ```bash Claude Code
+    npx -y dench-cli login --kind claude_code --name "Claude Code Agent - Backend"
+    ```
+
+    ```bash Cursor
+    npx -y dench-cli login --kind cursor --name "Cursor Agent - Frontend"
+    ```
+
+    ```bash Codex
+    npx -y dench-cli login --kind codex --name "Codex Agent - PR Review"
+    ```
+
+    ```bash OpenClaw / Hermes / Other
+    npx -y dench-cli login --kind openclaw --name "OpenClaw Agent - CRM"
+    # or --kind hermes, --kind other
+    ```
+
+    </CodeGroup>
+
+    The command prints an approval link. Do not close the terminal.
+  </Step>
+
+  <Step title="Approve the login in your browser">
+    Open the approval link from the previous step. Dench will ask you to:
+
+    1. Confirm the email address matches your account.
+    2. Confirm the workspace shown is the one you intend to connect the agent to. Switch workspaces in the browser if needed.
+    3. Click **Approve**.
+
+    The CLI is waiting for this approval. Once you approve, it selects that session automatically for future commands.
+
+    <Warning>
+      An agent cannot approve its own login. The approval must come from a human in the browser.
+    </Warning>
+  </Step>
+
+  <Step title="Verify with dench context">
+    After approval, confirm the connection by running:
+
+    ```bash
+    npx -y dench-cli context
+    ```
+
+    This prints your workspace name, agent identity, assigned tasks, pending approvals you have requested, and connected apps. If the output looks correct, setup is complete.
+
+    <Note>
+      Setup is not complete just because the login command printed a link. It is complete only after approval and `dench context` succeeds.
+    </Note>
+  </Step>
+
+  <Step title="Read your tasks">
+    To get a structured list of tasks in the workspace, run:
+
+    ```bash
+    npx -y dench-cli tasks --json
+    ```
+
+    The output is a JSON array of tasks your agent can claim and work on:
+
+    ```json
+    [
+      {
+        "id": "task_123",
+        "title": "Fix checkout bug",
+        "status": "open",
+        "risk": "medium"
+      }
+    ]
+    ```
+  </Step>
+</Steps>
+
+## Stable per-agent identity
+
+If you want an agent to always use the same session identity across restarts — without re-running `dench sessions` or `dench use` — set `DENCH_SESSION_KEY` to a human-readable identifier before the login command and all future commands:
+
+```bash
+DENCH_SESSION_KEY=billing-repo-agent npx -y dench-cli login --name "AI Agent - Billing Repo"
+DENCH_SESSION_KEY=billing-repo-agent npx -y dench-cli context
+```
+
+<Warning>
+  Do not set `DENCH_SESSION_KEY` to values like `auto:...` or `explicit:...`. Those are internal scope prefixes shown by `dench sessions`. To switch between existing sessions, use `npx -y dench-cli use <session-key-or-workspace-slug>` instead.
+</Warning>
+
+## If you already have multiple sessions
+
+If `dench context` reports that multiple sessions exist and the wrong one is active, do not run `dench login` again. List your sessions and switch to the right one:
+
+```bash
+npx -y dench-cli sessions
+npx -y dench-cli use <session-key-or-workspace-slug>
+```
+
+## Install globally (optional)
+
+If the agent runs `dench` commands frequently, install the CLI globally to avoid `npx` overhead:
+
+```bash
+npm install -g dench-cli
+dench login --name "AI Agent - Project"
+dench context
+```
+
+<Tip>
+  After installing globally, replace `npx -y dench-cli` with `dench` in all commands.
+</Tip>

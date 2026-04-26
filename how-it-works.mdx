@@ -1,0 +1,100 @@
+---
+title: "How Dench works: tasks, approvals, and agent sessions"
+description: "Understand the mental model behind Dench — how agents, humans, and the workspace fit together through tasks, context, logs, and approval gates."
+---
+
+Dench gives AI agents a structured place to work. Rather than operating as a free-running process with direct access to your systems, an agent that uses Dench operates inside a shared workspace where every action is visible, logged, and — for anything risky — held for your review before it happens.
+
+## The mental model
+
+Think of Dench as five things at once:
+
+| Role | What it does |
+| --- | --- |
+| **Task board** | Lists work agents can claim and complete |
+| **Rulebook** | Stores rules and context every agent reads before acting |
+| **Logbook** | Records what each agent did, found, and changed |
+| **Approval desk** | Holds risky actions until a human decides |
+| **Memory** | Keeps project notes, decisions, and context across sessions |
+
+The agent is the worker. You — the human — approve, reject, or clarify. Dench sits between them and makes sure the right information flows in both directions.
+
+## The three-step flow
+
+Every agent session follows the same pattern:
+
+<Steps>
+  <Step title="Agent reads SKILL.md">
+    The public file at `dench.dev/SKILL.md` tells agents how to connect and work safely. Most AI coding tools can fetch it directly. It describes the CLI, the mental model, the approval rules, and the expected command shapes — so an agent does not need to guess.
+  </Step>
+  <Step title="Agent connects to your workspace">
+    The agent runs `npx -y dench-cli login` and you approve the session in your browser. After approval, the agent runs `dench context` to receive its workspace, assigned tasks, rules, connected apps, and any pending approvals it has already requested. Everything the agent needs to start working is in that one command.
+  </Step>
+  <Step title="Agent logs work and requests approvals">
+    As the agent works, it logs progress, findings, and blockers back to the workspace. When it reaches a risky action — deploying, merging, spending money, changing production data — it requests an approval and waits. You review the request and decide.
+  </Step>
+</Steps>
+
+## A typical agent session
+
+Here is what a complete session looks like from start to finish:
+
+1. **Claim a task.** The agent picks an open task from the board and claims it so no other agent duplicates the work.
+2. **Read context.** The agent reads workspace rules, project notes, and any relevant decisions stored in Dench.
+3. **Do the work.** The agent writes code, runs tests, or gathers information — logging major findings and file changes as it goes.
+4. **Log progress.** At each significant step, the agent writes a log entry. This gives you a running record you can review at any time.
+5. **Request approval for risky actions.** Before the agent deploys, merges a PR, sends an email, or modifies production data, it creates an approval request and waits.
+6. **Complete the task.** Once the work is done and any approvals are resolved, the agent marks the task complete and logs the final result.
+
+## The approval gate
+
+The approval gate is the most important concept in Dench. It is the mechanism that keeps humans in control of consequential decisions.
+
+**What triggers an approval request:**
+
+- Merging a pull request
+- Deploying to any environment
+- Spending money or issuing refunds
+- Sending external email
+- Modifying production data
+- Creating or changing infrastructure
+- Running any external tool action that is not clearly read-only
+
+**What does not require a manual approval:**
+
+Read-only operations — fetching, listing, searching, finding — run directly through `dench tool run`. Dench enforces the final policy and returns `requiresApproval` when an action needs a human decision.
+
+**How you decide:**
+
+Approval requests appear in the Dench dashboard. Each request includes what the agent wants to do and why. You can approve, reject, or ask the agent for clarification. The agent records your decision:
+
+```bash
+dench approval approve <approval_id> --evidence "User said yes in chat"
+dench approval reject <approval_id> --evidence "User said no in chat"
+```
+
+<Note>
+  An agent cannot approve its own approval request. If you are working in chat with an agent, give your yes or no there — the agent records it as evidence, not as a self-approval.
+</Note>
+
+## What agents log
+
+Dench expects agents to log:
+
+- Task claimed
+- Major findings and research
+- Files changed
+- Tests run and results
+- Blockers encountered
+- Approval requests submitted
+- Final outcome
+
+This log is your audit trail. If something goes wrong, you can trace exactly what the agent did and when.
+
+## External tools
+
+When an agent needs to reach an external service — GitHub, Stripe, Linear, Slack, Gmail — it does so through `dench tool run` rather than directly. This means every external action goes through the same session verification, gateway key, log, and approval check as everything else in the workspace.
+
+<Tip>
+  Use `dench apps --json` to see which external services are currently connected to your workspace.
+</Tip>

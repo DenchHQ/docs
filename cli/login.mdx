@@ -1,0 +1,141 @@
+---
+title: "dench login: agent authentication and sessions"
+description: "Authenticate an AI agent with Dench, manage multiple sessions, and switch between workspaces using login, sessions, use, and logout."
+---
+
+Before an agent can read tasks, log progress, or request approvals, it must authenticate with Dench. The `dench login` command creates a browser-based approval flow: the CLI prints a URL, a human opens and approves it in their browser, and the CLI saves a session token locally. All subsequent commands use that session automatically.
+
+## `dench login`
+
+```bash
+dench login --name "AI Agent - Billing Repo" --kind claude_code
+```
+
+<ParamField path="--name" type="string">
+  The display name for this agent in the Dench workspace. Choose something descriptive that identifies the agent and its environment, such as `AI Agent - Billing Repo` or `Claude Code Agent - Backend`. If omitted, the CLI generates a name from the local username and hostname.
+</ParamField>
+
+<ParamField path="--kind" type="string">
+  The agent platform. Accepted values: `claude_code`, `codex`, `cursor`, `openclaw`, `hermes`, `other`. Defaults to `other` if omitted.
+</ParamField>
+
+<ParamField path="--host" type="string">
+  Override the default host. Defaults to `https://dench.dev`.
+</ParamField>
+
+<ParamField path="--staging" type="boolean">
+  Use the Dench staging environment instead of production.
+</ParamField>
+
+<ParamField path="--no-open" type="boolean">
+  Suppress automatic browser opening. The CLI still prints the approval URL.
+</ParamField>
+
+### The approval flow
+
+<Steps>
+  <Step title="Run dench login">
+    The CLI prints an approval URL and, unless `--no-open` is set, attempts to open it in the default browser.
+
+    ```bash
+    dench login --name "AI Agent - Billing Repo" --kind claude_code
+    ```
+  </Step>
+  <Step title="Human opens and approves">
+    Ask the human to open the printed URL, switch to the intended Dench workspace in their browser, and click **Approve**. The approval is tied to whichever workspace is currently selected in the browser.
+  </Step>
+  <Step title="CLI saves the session">
+    Once approved, the CLI saves the session token to `~/.dench/config.json` and prints confirmation, including the workspace name and agent name that future commands will use.
+  </Step>
+  <Step title="Verify with dench context">
+    Run `dench context` to confirm the workspace, agent identity, assigned tasks, and connected apps.
+
+    ```bash
+    dench context
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+  Login is not complete just because the CLI printed an approval URL. It is complete only after the human approves it in their browser and `dench context` succeeds.
+</Warning>
+
+### Stable per-agent identity
+
+To give an agent a fixed, named session slot from the start, prefix `login` and all future commands with a `DENCH_SESSION_KEY`:
+
+```bash
+DENCH_SESSION_KEY=billing-repo-agent dench login --name "AI Agent - Billing Repo"
+DENCH_SESSION_KEY=billing-repo-agent dench status --mine --json
+```
+
+<Note>
+  Do not set `DENCH_SESSION_KEY` to values like `auto:...` or `explicit:...`. Those are internal scope identifiers shown by `dench sessions`. To select an existing session by scope, use `dench use <session-key-or-workspace-slug>` instead.
+</Note>
+
+---
+
+## `dench sessions`
+
+List all locally stored Dench sessions. The active session for the current context is marked with `*`.
+
+```bash
+dench sessions
+dench sessions --json
+```
+
+Use this command to diagnose session ambiguity before reaching for `dench login` again.
+
+---
+
+## `dench use`
+
+Switch the active session by session key or workspace slug.
+
+```bash
+dench use <session-key-or-workspace-slug>
+```
+
+<ParamField path="session-key-or-workspace-slug" type="string" required>
+  The session key (e.g., `auto:abc123`) or workspace slug (e.g., `my-org`) to activate. Run `dench sessions` to see available values.
+</ParamField>
+
+---
+
+## `dench logout`
+
+Remove one or all locally stored sessions.
+
+```bash
+# Remove the session for the current context
+dench logout
+
+# Remove a specific session by key or scope
+dench logout --session <key>
+
+# Remove all local sessions
+dench logout --all
+```
+
+<ParamField path="--session" type="string">
+  The session key or scope to remove. Run `dench sessions` to find the key.
+</ParamField>
+
+<ParamField path="--all" type="boolean">
+  Remove every stored session. Cannot be combined with `--session`.
+</ParamField>
+
+---
+
+## Handling multiple sessions
+
+If `dench status` or another command reports that multiple sessions exist, do not run `dench login` again to resolve the ambiguity. Instead, list your sessions and pick the right one:
+
+```bash
+dench sessions
+dench use <session-key-or-workspace-slug>
+```
+
+<Tip>
+  Use `DENCH_SESSION_KEY=<stable-id>` as a prefix on every command to keep each agent in its own named session slot and avoid ambiguity entirely.
+</Tip>

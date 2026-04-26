@@ -1,0 +1,52 @@
+---
+title: "Dench: control room for AI agents"
+description: "Dench gives AI agents a shared workspace with tasks, context, rules, and human approvals. Get started in minutes with the Dench CLI."
+---
+
+Dench is a shared workspace where AI agents get everything they need before touching your work: tasks to claim, context to read, rules to follow, and a human approval path for risky actions. Agents log progress, and humans review and approve decisions — all in one place.
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Connect your first AI agent to Dench in under five minutes.
+  </Card>
+  <Card title="How It Works" icon="circle-info" href="/how-it-works">
+    Understand the mental model behind tasks, context, and approvals.
+  </Card>
+  <Card title="CLI Reference" icon="terminal" href="/cli/overview">
+    Every `dench` command agents use to work safely in your workspace.
+  </Card>
+  <Card title="DenchClaw" icon="claw-marks" href="/claw/introduction">
+    Local-first AI CRM built on OpenClaw. Runs at localhost:3100.
+  </Card>
+</CardGroup>
+
+## How Dench works
+
+<Steps>
+  <Step title="Agent reads SKILL.md">
+    The public skill file at `dench.dev/SKILL.md` tells agents how to connect and work safely. Most AI coding tools fetch it automatically.
+  </Step>
+  <Step title="Agent logs in">
+    The agent runs `npx -y dench-cli login --name "AI Agent - Project"` and you approve the login in your browser.
+  </Step>
+  <Step title="Agent gets context">
+    After login, the agent runs `dench context` to receive its workspace, assigned tasks, rules, and pending approvals.
+  </Step>
+  <Step title="Humans approve risky actions">
+    Before deploys, production changes, or external actions, agents request approval. You review and decide in the Dench dashboard.
+  </Step>
+</Steps>
+
+## Core features
+
+<CardGroup cols={3}>
+  <Card title="Tasks" icon="list-check">
+    Give agents clear work to claim and complete. Track status across your whole team.
+  </Card>
+  <Card title="Context" icon="book-open">
+    Keep project notes, decisions, and rules in one place that every agent can read.
+  </Card>
+  <Card title="Approvals" icon="shield-check">
+    Require a human check before deploys, money spent, or production data changed.
+  </Card>
+</CardGroup>

@@ -1,0 +1,201 @@
+---
+title: "dench tool: brokered access to external services"
+description: "Connect GitHub, Slack, Gmail, Stripe, and more through Dench. Search for tools, check connection status, and run actions with built-in approval enforcement."
+---
+
+Dench brokers access to external services through a unified `dench tool` interface. Instead of installing separate integrations or using the Composio CLI directly, you route all external tool calls through Dench. This ensures every action is tied to an authenticated agent session, logged in the workspace, and subject to approval enforcement.
+
+<Warning>
+  Do not install or run the Composio CLI directly. Use `dench tool ...` so Dench can verify the agent session, apply the workspace gateway key, log the action, and enforce approvals.
+</Warning>
+
+## Supported integrations
+
+GitHub, Slack, Gmail, Stripe, Linear, Google Drive, Notion, Salesforce, HubSpot, Google Calendar, Obsidian, LinkedIn, Asana, Monday, ClickUp, PostHog, Google Sheets, Apple Notes — and more.
+
+---
+
+## `dench apps`
+
+List all connected external apps for the current session. This is an alias for `dench tool status` with no toolkit argument.
+
+```bash
+dench apps
+dench apps --json
+```
+
+Run this first to see what is already connected before searching for tools or starting a new connection.
+
+---
+
+## `dench tool status`
+
+Check the connection status for all apps, or for a specific toolkit.
+
+```bash
+# All connected apps
+dench tool status --json
+
+# A specific toolkit
+dench tool status github --json
+dench tool status gmail --json
+```
+
+<ParamField path="toolkit" type="string">
+  The name of the toolkit to inspect. Omit to list all connected apps.
+</ParamField>
+
+---
+
+## `dench tool connect`
+
+Start the connection flow for an external toolkit. The command returns a URL for the human to open and approve in their browser.
+
+```bash
+dench tool connect github --json
+dench tool connect slack --json
+```
+
+<ParamField path="toolkit" type="string" required>
+  The name of the toolkit to connect. Must match a supported integration name.
+</ParamField>
+
+After running this command, ask the human to open the returned URL and complete the authorization. Once they approve, re-run `dench tool status <toolkit>` to confirm the connection is active.
+
+---
+
+## `dench tool search`
+
+Find available tools across connected apps. Start with the default compact output, which shows ranked results with slug, toolkit, approval requirement, and connection status.
+
+```bash
+dench tool search "create github issue"
+dench tool search "list recent gmail emails" --toolkit gmail
+dench tool search "send slack message" --toolkit slack --limit 5
+```
+
+<ParamField path="query" type="string" required>
+  A natural-language description of what you want to do. Pass it as the first positional argument.
+</ParamField>
+
+<ParamField path="--toolkit" type="string">
+  Limit results to a specific toolkit.
+</ParamField>
+
+<ParamField path="--limit" type="number">
+  Maximum number of results to return. Defaults to 20.
+</ParamField>
+
+<ParamField path="--compact" type="boolean">
+  Force compact output. Compact is the default; this flag has no effect unless you are overriding a previous flag.
+</ParamField>
+
+<Note>
+  Add `--json` only when you need full raw schemas or exact argument details. The default compact output includes everything needed to identify the right tool and run it.
+</Note>
+
+### Compact output format
+
+Each result in compact mode shows:
+
+- **slug** — the exact identifier to pass to `dench tool run`
+- **toolkit** — the connected app it belongs to
+- **approval** — whether the tool is `read-only` (safe to run directly) or `approval likely` (needs a human check)
+- **connected** — whether the app is currently connected
+
+---
+
+## `dench tool run`
+
+Run an external tool action through Dench.
+
+```bash
+dench tool run GMAIL_FETCH_EMAILS --args '{"max_results":10}' --json
+dench tool run GITHUB_CREATE_ISSUE \
+  --args '{"title":"Bug report","body":"Repro steps here"}' \
+  --json
+```
+
+<ParamField path="composio_tool_slug" type="string" required>
+  The exact tool slug returned by `dench tool search`. Pass it as the first positional argument.
+</ParamField>
+
+<ParamField path="--args" type="string">
+  A JSON object of arguments for the tool. Must be valid JSON. Enclose in single quotes to prevent shell expansion.
+</ParamField>
+
+<ParamField path="--account" type="string">
+  The connected account ID to use when the toolkit has multiple connected accounts.
+</ParamField>
+
+<ParamField path="--approval" type="string">
+  The approval ID returned by a previous `requiresApproval` response. Include this after the human has confirmed the action in chat.
+</ParamField>
+
+### Read-only tools
+
+Tool slugs containing `FETCH`, `GET`, `LIST`, `SEARCH`, `READ`, or `FIND` are considered read-only and run directly without a separate approval request. Dench enforces the final policy.
+
+```bash
+# These run without manual approval
+dench tool run GMAIL_FETCH_EMAILS --args '{"max_results":10}' --json
+dench tool run GITHUB_LIST_ISSUES --args '{"repo":"my-org/my-repo"}' --json
+dench tool run STRIPE_LIST_CUSTOMERS --args '{}' --json
+```
+
+### Actions that require approval
+
+All other tool slugs return `requiresApproval` with an approval ID when Dench determines a human check is needed. Ask the human in chat, then rerun the command with `--approval`:
+
+```bash
+# First run — Dench returns requiresApproval
+dench tool run GITHUB_CREATE_PULL_REQUEST \
+  --args '{"title":"Fix checkout bug","base":"main","head":"fix/checkout"}' \
+  --json
+
+# After human confirms in chat — rerun with the approval ID
+dench tool run GITHUB_CREATE_PULL_REQUEST \
+  --args '{"title":"Fix checkout bug","base":"main","head":"fix/checkout"}' \
+  --approval ap_789 \
+  --json
+```
+
+### Email and sensitive content
+
+When running email tools, prefer sender, subject, date, and short snippets over full message bodies. Do not repeat OTP codes, security codes, passwords, tokens, API keys, or secrets from email content.
+
+Non-JSON `dench tool run` output automatically redacts likely sensitive values such as OTP codes, API keys, and tokens. Use `--json` only when you need the raw provider response for cases that genuinely require it.
+
+---
+
+## Common workflow
+
+<Steps>
+  <Step title="Check what is connected">
+    ```bash
+    dench apps --json
+    ```
+  </Step>
+  <Step title="Connect a missing toolkit">
+    ```bash
+    dench tool connect stripe --json
+    # Ask the human to open the returned URL and approve
+    ```
+  </Step>
+  <Step title="Find the right tool">
+    ```bash
+    dench tool search "list active stripe customers" --toolkit stripe
+    ```
+  </Step>
+  <Step title="Run the tool">
+    ```bash
+    # Read-only — runs directly
+    dench tool run STRIPE_LIST_CUSTOMERS --args '{}' --json
+
+    # Write action — may need approval
+    dench tool run STRIPE_CREATE_REFUND \
+      --args '{"charge_id":"ch_abc123","amount":2500}' \
+      --json
+    ```
+  </Step>
+</Steps>

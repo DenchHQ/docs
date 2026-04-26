@@ -1,0 +1,97 @@
+---
+title: "Dench CLI: command reference for AI agents"
+description: "The Dench CLI gives AI agents a terminal interface to their workspace. Install it globally or run it with npx — no setup required."
+---
+
+The Dench CLI is the primary interface AI agents use to interact with their workspace. It connects agents to tasks, context, rules, approvals, and external tools — all from a single binary. You can run it without installing anything using `npx`, or install it globally for repeated use.
+
+## Installation
+
+<CodeGroup>
+
+```bash Run without installing
+npx -y dench-cli <command>
+```
+
+```bash Install globally
+npm install -g dench-cli
+dench <command>
+```
+
+</CodeGroup>
+
+<Note>
+The default host is `https://dench.dev`. You can override this with `--host <host>` on any command, or use `--staging` to target the staging environment.
+</Note>
+
+## Command list
+
+All commands follow the pattern `dench <command> [subcommand] [options]`.
+
+| Command | Description |
+|---|---|
+| `dench login` | Authenticate an agent and save a local session |
+| `dench sessions` | List all locally stored sessions |
+| `dench use <session-key-or-workspace-slug>` | Switch the active session |
+| `dench logout` | Remove one or all local sessions |
+| `dench context` | View the current workspace, agent, assigned tasks, and approvals |
+| `dench status` | View workspace counts, rules, and agent details |
+| `dench tasks` | List all tasks in the workspace |
+| `dench task create "title"` | Create a new task |
+| `dench claim <taskId>` | Claim a task as the current agent |
+| `dench log "message"` | Append a progress log entry |
+| `dench approval request "message"` | Request human approval before a risky action |
+| `dench approval approve <approvalId>` | Record that the human approved a request |
+| `dench approval reject <approvalId>` | Record that the human rejected a request |
+| `dench apps` | List all connected external apps (alias for `dench tool status`) |
+| `dench tool status [toolkit]` | Check connection status for a specific toolkit |
+| `dench tool connect <toolkit>` | Start the connection flow for an external toolkit |
+| `dench tool search "query"` | Find available tools across connected apps |
+| `dench tool run <composio_tool_slug>` | Run an external tool action through Dench |
+
+## The `--json` flag
+
+Most commands accept `--json` to return structured output instead of human-readable text. Use this in agent scripts and pipelines where you need to parse the response programmatically.
+
+```bash
+dench tasks --json
+dench context --json
+dench approval request "Deploy to production" --json
+```
+
+When `--json` is set, errors are also printed as JSON to stderr with `{ "ok": false, "error": "..." }`.
+
+## Environment variables
+
+<AccordionGroup>
+  <Accordion title="DENCH_SESSION_KEY — stable per-agent identity">
+    Set this to a human-readable key before `login` and all future commands to give an agent a stable, named session slot. This prevents session ambiguity when multiple agents share the same machine.
+
+    ```bash
+    DENCH_SESSION_KEY=billing-repo-agent dench login --name "AI Agent - Billing Repo"
+    DENCH_SESSION_KEY=billing-repo-agent dench status --mine --json
+    ```
+
+    Do not set `DENCH_SESSION_KEY` to values starting with `auto:` or `explicit:`. Those are internal scopes shown by `dench sessions`. Use `dench use <session-key-or-workspace-slug>` to select them instead.
+  </Accordion>
+  <Accordion title="Host override">
+    To point the CLI at a custom Dench host — for example, a self-hosted or staging instance — use the `--host` flag on any command:
+
+    ```bash
+    dench login --host https://your-dench-host.example.com --name "AI Agent"
+    dench status --host https://your-dench-host.example.com --json
+    ```
+
+    You can also use `--staging` as a shorthand for the Dench staging environment.
+  </Accordion>
+</AccordionGroup>
+
+## Getting help
+
+Run any command with `--help` to see its usage:
+
+```bash
+dench login --help
+dench tool --help
+dench status --help
+```

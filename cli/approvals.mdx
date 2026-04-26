@@ -1,0 +1,151 @@
+---
+title: "dench approvals: request and record human decisions"
+description: "Request human approval before risky actions, then record the outcome with approve or reject — with evidence attached to every decision."
+---
+
+Approvals are how agents check with a human before taking a consequential action. An agent requests approval, the human reviews it in the Dench dashboard or in chat, and the agent records the outcome. Every decision is logged with evidence so there is a clear audit trail.
+
+## When to request approval
+
+Always request human approval before any of the following actions:
+
+- Merging a pull request
+- Deploying to any environment
+- Spending money or issuing refunds
+- Sending external email
+- Changing production data
+- Creating or modifying infrastructure
+- Running any external tool action that is not clearly read-only
+
+<Tip>
+  Read-only tool actions — those with slugs containing `FETCH`, `GET`, `LIST`, `SEARCH`, `READ`, or `FIND` — do not require a separate approval request. Run them directly through Dench and let Dench enforce policy.
+</Tip>
+
+---
+
+## `dench approval request`
+
+Request human approval before a risky action. This creates a pending approval in the Dench workspace that the human sees in their approvals inbox.
+
+```bash
+dench approval request "Merge PR #42 to main" --task task_123 --json
+```
+
+<ParamField path="message" type="string" required>
+  A clear description of what you want to do and why. The human reads this when deciding whether to approve. Pass it as the first positional argument.
+</ParamField>
+
+<ParamField path="--task" type="string">
+  Associate this approval request with a specific task ID. Omit to attach it to the workspace generally.
+</ParamField>
+
+After running this command, ask the human directly in chat to review and decide. Do not proceed with the action until you have recorded a decision.
+
+---
+
+## `dench approval approve`
+
+Record that the human approved the request. Always include evidence of how the approval was given.
+
+```bash
+dench approval approve <approvalId> --evidence "User said yes in chat" --json
+```
+
+<ParamField path="approvalId" type="string" required>
+  The ID of the approval request to approve. Get this from the JSON output of `dench approval request`.
+</ParamField>
+
+<ParamField path="--evidence" type="string">
+  A description of how you know the human approved. Quote what they said, reference the message, or describe the explicit confirmation you received.
+</ParamField>
+
+---
+
+## `dench approval reject`
+
+Record that the human rejected the request. Always include evidence of how the rejection was given.
+
+```bash
+dench approval reject <approvalId> --evidence "User said no in chat" --json
+```
+
+<ParamField path="approvalId" type="string" required>
+  The ID of the approval request to reject.
+</ParamField>
+
+<ParamField path="--evidence" type="string">
+  A description of how you know the human rejected. Quote what they said or describe the explicit refusal.
+</ParamField>
+
+---
+
+## The full approval workflow
+
+<Steps>
+  <Step title="Ask the human in chat first">
+    Before running any approval commands, ask the human directly whether they want to proceed with the action. Do not record a decision until you have a clear yes or no.
+  </Step>
+  <Step title="Request the approval">
+    Run `dench approval request` to create a formal record of what you are asking to do.
+
+    ```bash
+    dench approval request "Deploy backend v2.3 to production" \
+      --task task_456 \
+      --json
+    ```
+
+    Save the `approvalId` from the response.
+  </Step>
+  <Step title="Human reviews in the dashboard">
+    The human sees the pending approval in their Dench approvals inbox, sorted by risk. They can also approve directly in chat.
+  </Step>
+  <Step title="Record the decision">
+    Once you have a clear answer, record it with evidence:
+
+    ```bash
+    # If approved
+    dench approval approve ap_789 \
+      --evidence "User confirmed in chat: 'yes go ahead'" \
+      --json
+
+    # If rejected
+    dench approval reject ap_789 \
+      --evidence "User said 'not yet, wait for QA'" \
+      --json
+    ```
+  </Step>
+  <Step title="Proceed or stop">
+    If approved, proceed with the action and log what you did. If rejected, log the outcome and wait for further instructions.
+  </Step>
+</Steps>
+
+---
+
+## Rules
+
+<Warning>
+  An agent cannot approve its own approval request. To approve a request, the human must use the Dench approvals page, or a different agent session with the necessary permissions must record the decision.
+</Warning>
+
+<AccordionGroup>
+  <Accordion title="Asking first, then recording">
+    Always ask the human in chat before recording a decision. The `approve` and `reject` commands are for recording a decision that has already been made — not for prompting the human to decide.
+  </Accordion>
+  <Accordion title="Tool actions that return requiresApproval">
+    When `dench tool run` returns a `requiresApproval` field with an approval ID, it means the tool action needs a human check before it can proceed. Ask the human in chat, then rerun the tool command with `--approval <approvalId>` once you have their explicit confirmation.
+
+    ```bash
+    # First attempt — returns requiresApproval
+    dench tool run GITHUB_CREATE_ISSUE --args '{"title":"Bug report"}' --json
+
+    # After human approves in chat
+    dench tool run GITHUB_CREATE_ISSUE \
+      --args '{"title":"Bug report"}' \
+      --approval ap_789 \
+      --json
+    ```
+  </Accordion>
+  <Accordion title="The Dench approvals inbox">
+    Humans review pending approvals in the Dench dashboard. Requests are sorted by risk level so high-risk actions appear first. Each request shows the agent name, the action description, the associated task, and a timestamp.
+  </Accordion>
+</AccordionGroup>

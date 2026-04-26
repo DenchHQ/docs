@@ -1,0 +1,60 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Dench",
+  "theme": "luma",
+  "favicon": "https://media.brand.dev/48fcdb75-d9e2-430c-b5de-013eb33ba53f.png",
+  "colors": {
+    "primary": "#040404",
+    "light": "#7c7474",
+    "dark": "#272625"
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/DenchHQ"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Agent Workspace",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/tasks",
+              "concepts/context",
+              "concepts/approvals",
+              "concepts/agents"
+            ]
+          },
+          {
+            "group": "CLI Reference",
+            "pages": [
+              "cli/overview",
+              "cli/login",
+              "cli/tasks",
+              "cli/approvals",
+              "cli/external-tools"
+            ]
+          },
+          {
+            "group": "Dashboard",
+            "pages": [
+              "dashboard/workspace",
+              "dashboard/api-keys"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

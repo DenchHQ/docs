@@ -1,0 +1,87 @@
+---
+title: "Workspace dashboard: agents, tasks, and approvals"
+description: "The Dench workspace dashboard shows connected agents, your task board, and the approvals inbox where you review and decide on pending agent requests."
+---
+
+The workspace dashboard is where you monitor what your agents are doing and step in when they need a human decision. When you sign in, you land on the approvals inbox for your active workspace. From here you can see which agents are connected, review tasks in progress, and approve or reject any requests that are waiting on you.
+
+## Approvals inbox
+
+The approvals inbox is the primary place for human decisions. Each time an agent needs permission before a risky action — deploying, modifying production data, sending external email, spending money — it creates an approval request that appears here.
+
+Pending approvals always appear at the top, sorted by risk level from high to low. Within the same risk level, newer requests appear before older ones. Below the pending section, you can see the last ten decided approvals under **Recent decisions**.
+
+<Note>
+  If the inbox is empty, no approvals are waiting. Agents will show requests here as soon as they need one.
+</Note>
+
+### What each approval card shows
+
+Every approval card displays the information you need to make a confident decision:
+
+- **Title** — a short description of the action the agent is requesting
+- **Reason** — the agent's explanation for why the action is needed
+- **Risk badge** — `high`, `medium`, or `low`, shown in red, amber, or neutral
+- **Status badge** — `pending`, `approved`, `rejected`, or `canceled`
+- **Agent** — the name of the agent that submitted the request
+- **Task** — the linked task, if the agent is working on one
+- **Created** — the timestamp when the request was submitted
+
+### Tool approval details
+
+When an agent uses an external tool that requires approval, the card also shows a **Tool approval** section with extra context:
+
+- **Tool** — the tool slug (e.g. `GITHUB_CREATE_PULL_REQUEST`)
+- **Argument keys** — the parameter names the agent is passing to the tool
+- **Policy** — whether the tool's approval policy requires a human decision
+- **Policy reason** — the reason from the tool's approval policy, if set
+
+Use these details to understand exactly what the agent wants to do before you decide.
+
+### Approving or rejecting
+
+<Warning>
+  Only workspace admins can approve or reject pending requests. If you are a member but not an admin, the approve and reject buttons are disabled.
+</Warning>
+
+To act on a pending approval:
+
+<Steps>
+  <Step title="Review the card">
+    Read the title, reason, and any tool approval details. Check the risk level and which agent submitted the request.
+  </Step>
+  <Step title="Click Approve or Reject">
+    Select **Approve** to let the agent proceed, or **Reject** to block the action. The dashboard confirms the decision immediately and the agent receives the result in real time.
+  </Step>
+</Steps>
+
+Once decided, the card moves to the **Recent decisions** section. The timestamp under the card shows when the decision was recorded.
+
+## Switching workspaces
+
+If you have multiple workspaces, agents must be connected to the right one before their approval requests appear in your inbox. When an agent runs `dench login`, the approval link it generates uses whichever workspace is currently selected in your browser.
+
+<Tip>
+  Before approving an agent login, check the workspace name shown on the approval page. Switch to the intended workspace first if it does not match.
+</Tip>
+
+After login, the agent can also switch workspaces explicitly:
+
+```bash
+dench use <workspace-slug>
+```
+
+The workspace slug appears in the URL when you are signed in to the Dench dashboard (for example, `acme-corp` in `workspace.dench.com/acme-corp/approvals`). Use this slug with `dench use` to point an agent at the correct workspace.
+
+## Workspace roles
+
+<AccordionGroup>
+  <Accordion title="Admins">
+    Admins can view the approvals inbox, approve or reject pending requests, and manage workspace settings including API keys. Only admins can make approval decisions from the dashboard.
+  </Accordion>
+  <Accordion title="Members">
+    Members can view the approvals inbox and see the status of all requests, but cannot approve or reject. The approve and reject buttons appear disabled with the message "Only workspace admins can approve or reject."
+  </Accordion>
+</AccordionGroup>
+
+To change a member's role, go to your workspace settings and update their permissions there.

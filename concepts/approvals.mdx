@@ -1,0 +1,120 @@
+---
+title: "Approvals: human decisions before risky actions"
+description: "Understand how the Dench approval gate works, what always requires human sign-off, and how agents request and record approval decisions."
+---
+
+An approval is a human decision required before an agent takes a risky or irreversible action. When an agent reaches a step that could cause real-world consequences — deploying code, spending money, merging a PR, sending an email — it must pause, request approval, and wait for a human to decide before proceeding. Approvals are the core safety mechanism in Dench: they ensure that humans remain in control of consequential actions even when agents are doing the work.
+
+## Approval fields
+
+Each approval request carries the following fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique identifier (e.g., `approval_456`). |
+| `title` | string | Short description of what needs approval. |
+| `reason` | string | Why the action requires a human decision. |
+| `risk` | `low` \| `medium` \| `high` | How dangerous or irreversible the action is. |
+| `status` | `pending` \| `approved` \| `rejected` \| `canceled` | Current state of the approval. |
+| `agentId` | string | ID of the agent that made the request. |
+| `taskId` | string | Optional ID of the task the action relates to. |
+
+## What always requires approval
+
+The following actions always require a human approval, regardless of risk level or task settings:
+
+<AccordionGroup>
+  <Accordion title="Code and infrastructure changes">
+    - Merging a pull request
+    - Deploying to any environment
+    - Creating or modifying infrastructure
+    - Changing production data
+  </Accordion>
+  <Accordion title="Financial actions">
+    - Spending money
+    - Issuing refunds
+  </Accordion>
+  <Accordion title="External communication">
+    - Sending external email
+    - Any external tool action that is not clearly read-only
+  </Accordion>
+</AccordionGroup>
+
+Read-only tool actions — those whose slug contains `FETCH`, `GET`, `LIST`, `SEARCH`, `READ`, or `FIND` — do not require manual approval. Dench enforces this distinction automatically when you use `dench tool run`.
+
+## Requesting approval
+
+When your agent reaches a step that requires human sign-off, call `dench approval request` before taking any action.
+
+```bash
+dench approval request "Deploy backend service to production" \
+  --task task_123 \
+  --json
+```
+
+The response includes an approval ID. Your agent should pause and wait for the human to decide before continuing.
+
+<Warning>
+  Never take the action before receiving a decision. Request the approval, inform the human, and wait for an explicit yes or no.
+</Warning>
+
+## How humans decide
+
+Humans review and act on approval requests in the Dench dashboard under **Approvals inbox**. Pending requests appear first, sorted by risk level. Each card shows the title, reason, risk, requesting agent, linked task, and creation time.
+
+Workspace admins can click **Approve** or **Reject** directly from the dashboard. Only admins can make approval decisions.
+
+## Recording decisions from the agent
+
+After the human decides, record the outcome through the CLI using the approval ID.
+
+<CodeGroup>
+
+```bash Approved
+dench approval approve approval_456 \
+  --evidence "User approved in chat: 'yes, deploy it'" \
+  --json
+```
+
+```bash Rejected
+dench approval reject approval_456 \
+  --evidence "User rejected in chat: 'not yet, wait for tests'" \
+  --json
+```
+
+</CodeGroup>
+
+The `--evidence` flag captures where and how the human gave their decision. Include a short quote or description so there is an audit trail.
+
+<Note>
+  An agent cannot approve its own approval request. Use the Dench dashboard, or record the decision from a different agent session.
+</Note>
+
+## Tool approvals
+
+When you run a non-read-only external tool through `dench tool run`, Dench automatically returns a `requiresApproval` response with an approval ID instead of executing the action.
+
+```bash
+dench tool run GITHUB_CREATE_PR \
+  --args '{"title": "Fix checkout", "base": "main"}' \
+  --json
+```
+
+If the tool requires approval, the response includes `requiresApproval: true` and an `approvalId`. Ask the human, then rerun with `--approval <approvalId>` once approved.
+
+```bash
+dench tool run GITHUB_CREATE_PR \
+  --args '{"title": "Fix checkout", "base": "main"}' \
+  --approval approval_456 \
+  --json
+```
+
+## Approval lifecycle
+
+```
+pending → approved → (agent proceeds)
+        → rejected → (agent stops or finds alternative)
+        → canceled → (request withdrawn before decision)
+```
+
+Once an approval moves out of `pending`, the decision is final. The Dench dashboard shows the 10 most recent decided approvals below the pending queue so you have a record of recent decisions.

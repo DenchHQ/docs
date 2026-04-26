@@ -1,0 +1,104 @@
+{
+  "projectType": "saas",
+  "projectName": "Dench",
+  "projectDescription": "Dench is a shared workspace that gives AI agents tasks, context, rules, and a human approval path before they touch your work.",
+  "theme": "luma",
+  "primaryColor": "#040404",
+  "lightColor": "#7c7474",
+  "darkColor": "#272625",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Agent Workspace",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/tasks",
+              "concepts/context",
+              "concepts/approvals",
+              "concepts/agents"
+            ]
+          },
+          {
+            "group": "CLI Reference",
+            "pages": [
+              "cli/overview",
+              "cli/login",
+              "cli/tasks",
+              "cli/approvals",
+              "cli/external-tools"
+            ]
+          },
+          {
+            "group": "Dashboard",
+            "pages": [
+              "dashboard/workspace",
+              "dashboard/api-keys"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "DenchClaw",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "claw/introduction",
+              "claw/quickstart"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "claw/database",
+              "claw/ai-chat",
+              "claw/integrations",
+              "claw/skills"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Agent task board — agents claim and complete tasks from a shared workspace",
+    "Context store — project notes, rules, and decisions kept in one place for agents",
+    "Human approval gates — require a human check before deploys, production changes, or risky actions",
+    "dench-cli — agent-facing CLI for login, task management, logging, and approvals",
+    "External tool brokering — agents run Composio-backed tools (GitHub, Slack, Gmail, Stripe, etc.) through Dench with approval enforcement",
+    "Gateway API keys — manage keys for workspace and sandbox access",
+    "DenchClaw — local-first AI CRM powered by OpenClaw, runs at localhost:3100",
+    "DenchClaw Skills Store — extend the agent with one-command skill installs"
+  ],
+  "publicApiSurface": [
+    "dench login --name <name> --kind <kind>",
+    "dench sessions",
+    "dench use <session-key-or-workspace-slug>",
+    "dench logout",
+    "dench context",
+    "dench status [--mine]",
+    "dench tasks",
+    "dench task create <title> --description --priority --risk",
+    "dench claim <taskId>",
+    "dench log <message>",
+    "dench approval request <message>",
+    "dench approval approve <approvalId> --evidence",
+    "dench approval reject <approvalId> --evidence",
+    "dench apps",
+    "dench tool status [toolkit]",
+    "dench tool connect <toolkit>",
+    "dench tool search <query>",
+    "dench tool run <composio_tool_slug> --args",
+    "npx denchclaw"
+  ]
+}

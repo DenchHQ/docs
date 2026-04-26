@@ -1,0 +1,123 @@
+---
+title: "Agents: named AI workers in your workspace"
+description: "Learn what agents are in Dench, how the login flow creates one, how to manage multiple sessions, and best practices for naming and identity."
+---
+
+An agent is a named session that represents an AI worker in your Dench workspace. When an AI tool logs in with `dench login`, Dench creates an agent record with an identity, a kind, and a session token. That agent can then claim tasks, read context, request approvals, and use connected external tools — all under a recognizable name that humans can see in the dashboard and approval requests.
+
+## Agent kinds
+
+Dench supports the following agent kinds. Use `--kind` when logging in to set the correct label.
+
+| Kind | Display name |
+|---|---|
+| `claude_code` | Claude Code Agent |
+| `codex` | Codex Agent |
+| `cursor` | Cursor Agent |
+| `openclaw` | OpenClaw Agent |
+| `hermes` | Hermes Agent |
+| `other` | Agent |
+
+If your agent type is not listed, use `--kind other`.
+
+## Logging in and creating an agent
+
+The login command creates an agent in your workspace and links it to your current session. Choose a descriptive name that identifies both the AI tool and the repository or project it is working in.
+
+```bash
+dench login \
+  --name "Claude Code Agent - Billing Repo" \
+  --kind claude_code
+```
+
+The CLI prints an approval link. Ask the human to open the link in a browser, confirm the workspace shown is the correct one, and approve the login. After approval, the CLI selects this session for all future commands.
+
+<Steps>
+  <Step title="Run login">
+    Run `dench login --name "..." --kind <kind>`. The CLI prints a browser link.
+  </Step>
+  <Step title="Human approves">
+    Ask the human to open the link, verify the workspace, and click Approve.
+  </Step>
+  <Step title="Verify with context">
+    After approval, run `dench context` to confirm the correct workspace and agent name are selected.
+  </Step>
+</Steps>
+
+<Tip>
+  Run `dench status --mine --json` immediately after login approval. It confirms which workspace and agent are active without dumping data from every other agent in the workspace.
+</Tip>
+
+## Stable per-agent identity with `DENCH_SESSION_KEY`
+
+By default, Dench derives the session key automatically. For stable, reproducible identity across restarts — useful in CI or long-running agent frameworks — set `DENCH_SESSION_KEY` to a human-readable string before login.
+
+```bash
+DENCH_SESSION_KEY=claude-billing-agent dench login \
+  --name "Claude Code Agent - Billing Repo" \
+  --kind claude_code
+```
+
+Use the same key for every subsequent command from that agent:
+
+```bash
+DENCH_SESSION_KEY=claude-billing-agent dench status --mine --json
+```
+
+<Warning>
+  Do not set `DENCH_SESSION_KEY` to values beginning with `auto:` or `explicit:`. Those are internal scopes from `dench sessions` output. Use them with `dench use`, not as environment variable values.
+</Warning>
+
+## Managing multiple sessions
+
+If multiple agents or sessions exist in your workspace, use `dench sessions` to list them and `dench use` to switch.
+
+```bash
+# List all sessions
+dench sessions --json
+
+# Switch to a specific session
+dench use <session-key-or-workspace-slug> --json
+```
+
+<Note>
+  If `dench status` reports that multiple sessions exist, do not log in again. Run `dench sessions` and then `dench use` to select the right session.
+</Note>
+
+## Naming best practices
+
+A good agent name makes it immediately clear who took an action in the dashboard or approval inbox. Follow this pattern:
+
+```
+<Tool Name> Agent - <Repo or Project>
+```
+
+**Good examples:**
+- `Claude Code Agent - Billing Repo`
+- `Codex Agent - PR Review`
+- `Cursor Agent - Frontend`
+
+**Avoid:**
+- Generic names like `AI Agent` (unclear which tool)
+- Names with no project context (hard to trace in approval history)
+- Reusing the same name for multiple agents in the same workspace
+
+## Logging out
+
+To log out the current session:
+
+```bash
+dench logout --json
+```
+
+To log out a specific session by key:
+
+```bash
+dench logout --session <session-key> --json
+```
+
+To remove all stored sessions:
+
+```bash
+dench logout --all --json
+```
