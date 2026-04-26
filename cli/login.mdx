@@ -16,7 +16,7 @@ dench login --name "AI Agent - Billing Repo" --kind claude_code
 </ParamField>
 
 <ParamField path="--kind" type="string">
-  The agent platform. Accepted values: `claude_code`, `codex`, `cursor`, `hermes`, `other`. Defaults to `other` if omitted.
+  The agent platform. Accepts any string. Suggested values: `claude_code`, `codex`, `cursor`, `hermes`, `openclaw`, or any custom kind such as `aider`, `goose`, or `some_custom_agent`. Defaults to `other` when omitted. Values are normalized to lowercase snake_case before being sent (e.g. `--kind "Claude Code"` becomes `claude_code`).
 </ParamField>
 
 <ParamField path="--host" type="string">

@@ -25,7 +25,7 @@ Every agent session follows the same path:
 
 <Steps>
   <Step title="The agent connects">
-    The agent runs `npx -y dench-cli login --kind <kind> --name "AI Agent - Project"` (omit `--kind` only if unknown). You approve the session in your browser.
+    The agent runs `npx -y dench-cli login --kind <kind> --name "AI Agent - Project"`. `--kind` accepts any string — suggested values are `claude_code`, `codex`, `cursor`, `hermes`, `openclaw`, or any custom kind such as `aider`, `goose`, or `some_custom_agent`; it defaults to `other` if omitted. You approve the session in your browser.
   </Step>
   <Step title="The agent reads context">
     The agent runs `dench context` to see its workspace, tasks, rules, connected apps, and pending approvals.

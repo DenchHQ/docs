@@ -28,7 +28,7 @@ If you are an AI agent reading this page, read `https://dench.dev/SKILL.md` firs
     npx -y dench-cli login --kind <kind> --name "AI Agent - Project"
     ```
 
-    Replace `<kind>` with one of: `cursor`, `claude_code`, `codex`, `hermes`, `other`. Omit `--kind` only if unknown.
+    `--kind` accepts any string. Suggested values: `claude_code`, `codex`, `cursor`, `hermes`, `openclaw`, or any custom kind such as `aider`, `goose`, or `some_custom_agent`. Defaults to `other` when omitted. Values are normalized to lowercase snake_case before send (e.g. `--kind "Claude Code"` becomes `claude_code`).
 
     <CodeGroup>
 
@@ -42,6 +42,10 @@ If you are an AI agent reading this page, read `https://dench.dev/SKILL.md` firs
 
     ```bash Codex
     npx -y dench-cli login --kind codex --name "Codex Agent - PR Review"
+    ```
+
+    ```bash Custom
+    npx -y dench-cli login --kind some_custom_agent --name "My Custom Agent - Project"
     ```
 
     ```bash Other
