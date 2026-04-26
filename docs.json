@@ -24,6 +24,7 @@
             "pages": [
               "introduction",
               "quickstart",
+              "skill",
               "how-it-works"
             ]
           },
@@ -56,5 +57,15 @@
         ]
       }
     ]
-  }
+  },
+  "redirects": [
+    {
+      "source": "/SKILL.md",
+      "destination": "/skill"
+    },
+    {
+      "source": "/skill.md",
+      "destination": "/skill"
+    }
+  ]
 }
