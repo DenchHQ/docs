@@ -1,0 +1,72 @@
+---
+title: "Long Sessions and AI credits"
+description: "Run bounded autonomous agent sessions with prepaid AI credits, approval gates, durable artifacts, and clear recovery paths."
+---
+
+Long Sessions let an agent work autonomously for a bounded period.
+
+They run in an isolated sandbox, stream progress to Dench, save artifacts, ask before risky actions, consume prepaid AI credits, and stop when done or blocked.
+
+## Start from the CLI
+
+```bash
+npx -y dench-cli autonomous run "Find useful work to do in this workspace. Do not edit files, publish, deploy, spend money, send external messages, access secrets, or change production data." --duration 30m --json
+```
+
+Use one of these durations: `30m`, `1h`, `3h`, `5h`, or `until-done`.
+
+## Credits
+
+Long Sessions use prepaid AI credits.
+
+- If credits are available, Dench starts the run and returns `runId`, `workflowRunId`, `status`, and `runUrl`.
+- If credits are empty, Dench returns `code: "ai_credits_required"` and a `topUpUrl`.
+- If a running session exhausts credits, it pauses. Do not retry in a loop. Ask the human to top up, then resume the same run.
+
+## Recovery
+
+In `--json` mode, failed starts return structured errors:
+
+```json
+{
+  "ok": false,
+  "status": 402,
+  "code": "ai_credits_required",
+  "topUpUrl": "https://dench.dev/usage",
+  "nextActions": [
+    "Top up AI credits before starting a Long Session.",
+    "Retry the same request after the balance updates."
+  ]
+}
+```
+
+Follow `nextActions` once. If the same blocker repeats, report it to the human instead of retrying.
+
+## Approval rules
+
+Long Sessions still need human approval before risky actions:
+
+- publishing
+- deploying
+- spending money
+- sending external messages
+- accessing secrets
+- changing production data
+
+If a prompt says not to do a risky action, obey that instruction. Do not request approval just because a risky word appears in a negated safety sentence.
+
+## Artifacts and suggested work
+
+Use artifacts for durable output: reports, notes, task suggestions, drafts, and patches.
+
+Review task suggestions with:
+
+```bash
+npx -y dench-cli suggested-work --json
+```
+
+Convert a useful suggestion into a task:
+
+```bash
+npx -y dench-cli suggested-work task <artifact_id> --json
+```

@@ -1,6 +1,6 @@
 ---
 title: "Dench CLI overview and installation"
-description: "The Dench CLI gives AI agents a terminal interface to their workspace — install globally with npm, run with npx, and use --json for scriptable output."
+description: "The Dench CLI gives AI agents a terminal interface to their workspace — onboard, read context, manage tasks, request approvals, use tools, and start Long Sessions."
 ---
 
 The Dench CLI is the agent's interface to its workspace. Run with `npx -y dench-cli` or install globally.
@@ -30,6 +30,8 @@ All commands follow the pattern `dench <command> [subcommand] [options]`.
 
 | Command | Description |
 |---|---|
+| `dench onboard` | Log in if needed and show orientation, next actions, tasks, tools, memory, artifacts, and Long Sessions |
+| `dench what-can-i-do` | Show agent orientation for the current workspace |
 | `dench login` | Authenticate an agent and save a local session |
 | `dench sessions` | List all locally stored sessions |
 | `dench use <session-key-or-workspace-slug>` | Switch the active session |
@@ -40,6 +42,11 @@ All commands follow the pattern `dench <command> [subcommand] [options]`.
 | `dench task create "title"` | Create a new task |
 | `dench claim <taskId>` | Claim a task as the current agent |
 | `dench log "message"` | Append a progress log entry |
+| `dench memory search "query"` | Search stable workspace memories |
+| `dench memory save <key> "text"` | Save a stable fact, decision, preference, goal, or tool note |
+| `dench artifacts` | List durable Long Session artifacts |
+| `dench suggested-work` | List task suggestions saved by Long Sessions |
+| `dench suggested-work task <artifactId>` | Convert useful suggested work into a task |
 | `dench approval request "message"` | Request human approval before a risky action |
 | `dench approval approve <approvalId>` | Record that the human approved a request |
 | `dench approval reject <approvalId>` | Record that the human rejected a request |
@@ -48,6 +55,7 @@ All commands follow the pattern `dench <command> [subcommand] [options]`.
 | `dench tool connect <toolkit>` | Start the connection flow for an external toolkit |
 | `dench tool search "query"` | Find available tools across connected apps |
 | `dench tool run <composio_tool_slug>` | Run an external tool action through Dench |
+| `dench autonomous run "goal"` | Start a bounded Long Session using prepaid AI credits |
 
 ## The `--json` flag
 
@@ -59,16 +67,27 @@ dench context --json
 dench approval request "Deploy to production" --json
 ```
 
-When `--json` is set, errors are also printed as JSON to stderr with `{ "ok": false, "error": "..." }`.
+When `--json` is set, errors are also printed as JSON to stderr. Agent-facing errors include `ok: false`, `error`, and usually a `code` plus `nextActions`. Follow the next action once. Do not retry blockers in a loop.
+
+```json
+{
+  "ok": false,
+  "code": "login_required",
+  "error": "dench tool requires dench login",
+  "nextActions": [
+    "Run dench onboard --kind <kind> --name \"AI Agent - Project\"."
+  ]
+}
+```
 
 ## Environment variables
 
 <AccordionGroup>
   <Accordion title="DENCH_SESSION_KEY — stable per-agent identity">
-    Set this to a human-readable key before `login` and all future commands to give an agent a stable, named session slot. This prevents session ambiguity when multiple agents share the same machine.
+    Set this to a human-readable key before `onboard` or `login` and all future commands to give an agent a stable, named session slot. This prevents session ambiguity when multiple agents share the same machine.
 
     ```bash
-    DENCH_SESSION_KEY=billing-repo-agent dench login --name "AI Agent - Billing Repo"
+    DENCH_SESSION_KEY=billing-repo-agent dench onboard --name "AI Agent - Billing Repo"
     DENCH_SESSION_KEY=billing-repo-agent dench status --mine --json
     ```
 

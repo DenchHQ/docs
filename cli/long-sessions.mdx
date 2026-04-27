@@ -1,0 +1,109 @@
+---
+title: "Long Sessions in the Dench CLI"
+description: "Start bounded autonomous agent runs with prepaid AI credits, safety rules, artifacts, and clear recovery steps."
+---
+
+Long Sessions let an agent work autonomously for a bounded time in an isolated
+sandbox. They stream progress, save artifacts, ask before risky actions, consume
+prepaid AI credits, and pause when credits run out.
+
+## Start a Long Session
+
+Use a clear goal and duration. Include safety limits in the goal.
+
+```bash
+dench autonomous run "Find useful work to do in this workspace. Review context and save task_suggestion artifacts. Do not edit files, publish, deploy, spend money, send external messages, access secrets, or change production data." --duration 30m --json
+```
+
+Durations: `30m`, `1h`, `3h`, `5h`, or `until-done`.
+
+If you run from a fresh machine, authenticate first:
+
+```bash
+dench onboard --kind <kind> --name "AI Agent - Project"
+```
+
+## Credits
+
+Long Sessions use prepaid AI credits. If credits are empty, the CLI and API
+return a structured blocker:
+
+```json
+{
+  "ok": false,
+  "status": 402,
+  "code": "ai_credits_required",
+  "topUpUrl": "https://dench.dev/usage",
+  "nextActions": [
+    "Top up AI credits before starting a Long Session.",
+    "Retry the same request after the balance updates."
+  ]
+}
+```
+
+Do not retry in a loop. Ask the human to top up credits, then retry once the
+balance updates.
+
+## Paused Runs
+
+If a run pauses because credits are empty:
+
+1. Open the run detail page.
+2. Top up credits through the approved billing path.
+3. Click `Resume`.
+4. Confirm the same run moves back to `starting` or `running`.
+
+The resumed run should keep its original run ID and record a resume event.
+
+## Artifacts And Suggested Work
+
+Long Sessions should save durable work as artifacts:
+
+- reports
+- research notes
+- content drafts
+- patches
+- `task_suggestion` artifacts for follow-up work
+
+Review suggested work with:
+
+```bash
+dench suggested-work --json
+```
+
+Convert useful suggested work into a task:
+
+```bash
+dench suggested-work task <artifactId> --json
+```
+
+If the suggestion is already applied or archived, choose another suggestion or
+create a new task manually.
+
+## Safe And Risky Goals
+
+Safe goals can include negated risky words:
+
+```txt
+Audit the repo. Do not deploy, publish, spend money, send messages, access secrets, or change production data.
+```
+
+Risky goals require approval before the action happens:
+
+```txt
+Deploy the app to production.
+```
+
+The agent should request approval, wait for the human, and only continue after a
+clear approval.
+
+## Failure Recovery
+
+| Problem | What to do |
+|---|---|
+| `missing_goal` | Retry with a clear goal and safety limits. |
+| `invalid_duration` | Use `30m`, `1h`, `3h`, `5h`, or `until-done`. |
+| `unauthorized` or `agent_session_invalid` | Run `dench sessions --json`, then `dench use <session-key-or-workspace-slug>`, or run `dench onboard` again if the session expired. |
+| `ai_credits_required` | Top up credits from the `topUpUrl`, then retry or resume. |
+| Sandbox setup failed | Save the error as an artifact or log, then ask the human whether to retry. Do not keep retrying silently. |
+| Missing Daytona, Bedrock, 1Password, or Exa credentials | Report the missing credential and wait for an admin. Do not invent secrets. |

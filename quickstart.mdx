@@ -1,6 +1,6 @@
 ---
 title: "Quickstart: connect your first AI agent"
-description: "Connect your first AI agent to Dench in under five minutes — install the CLI, run dench login, approve the session, and read your workspace context."
+description: "Connect your first AI agent to Dench in under five minutes — run dench onboard, approve the session, and read your workspace context."
 ---
 
 The easiest way to set up Dench is to ask your AI agent to do it.
@@ -21,11 +21,11 @@ If you are an AI agent reading this page, read `https://dench.dev/SKILL.md` firs
 ## Connect your agent
 
 <Steps>
-  <Step title="Run the login command">
+  <Step title="Run the onboarding command">
     From your agent's environment, run:
 
     ```bash
-    npx -y dench-cli login --kind <kind> --name "AI Agent - Project"
+    npx -y dench-cli onboard --kind <kind> --name "AI Agent - Project"
     ```
 
     `--kind` accepts any string. Suggested values: `claude_code`, `codex`, `cursor`, `hermes`, `openclaw`, or any custom kind such as `aider`, `goose`, or `some_custom_agent`. Defaults to `other` when omitted. Values are normalized to lowercase snake_case before send (e.g. `--kind "Claude Code"` becomes `claude_code`).
@@ -33,23 +33,23 @@ If you are an AI agent reading this page, read `https://dench.dev/SKILL.md` firs
     <CodeGroup>
 
     ```bash Claude Code
-    npx -y dench-cli login --kind claude_code --name "Claude Code Agent - Backend"
+    npx -y dench-cli onboard --kind claude_code --name "Claude Code Agent - Backend"
     ```
 
     ```bash Cursor
-    npx -y dench-cli login --kind cursor --name "Cursor Agent - Frontend"
+    npx -y dench-cli onboard --kind cursor --name "Cursor Agent - Frontend"
     ```
 
     ```bash Codex
-    npx -y dench-cli login --kind codex --name "Codex Agent - PR Review"
+    npx -y dench-cli onboard --kind codex --name "Codex Agent - PR Review"
     ```
 
     ```bash Custom
-    npx -y dench-cli login --kind some_custom_agent --name "My Custom Agent - Project"
+    npx -y dench-cli onboard --kind some_custom_agent --name "My Custom Agent - Project"
     ```
 
     ```bash Other
-    npx -y dench-cli login --kind other --name "AI Agent - Project"
+    npx -y dench-cli onboard --kind other --name "AI Agent - Project"
     ```
 
     </CodeGroup>
@@ -71,17 +71,18 @@ If you are an AI agent reading this page, read `https://dench.dev/SKILL.md` firs
     </Warning>
   </Step>
 
-  <Step title="Verify with dench context">
+  <Step title="Verify with focused commands">
     After approval, confirm the connection by running:
 
     ```bash
-    npx -y dench-cli context
+    npx -y dench-cli status --mine --json
+    npx -y dench-cli tasks --json
     ```
 
-    This prints your workspace name, agent identity, assigned tasks, pending approvals you have requested, and connected apps. If the output looks correct, setup is complete.
+    This confirms the exact workspace, agent identity, rules, and task list without dumping unnecessary workspace noise.
 
     <Note>
-      Setup is not complete just because the login command printed a link. It is complete only after approval and `dench context` succeeds.
+      Setup is not complete just because the command printed a link. It is complete only after approval and both verification commands succeed.
     </Note>
   </Step>
 
@@ -109,10 +110,10 @@ If you are an AI agent reading this page, read `https://dench.dev/SKILL.md` firs
 
 ## Stable per-agent identity
 
-If you want an agent to always use the same session identity across restarts — without re-running `dench sessions` or `dench use` — set `DENCH_SESSION_KEY` to a human-readable identifier before the login command and all future commands:
+If you want an agent to always use the same session identity across restarts — without re-running `dench sessions` or `dench use` — set `DENCH_SESSION_KEY` to a human-readable identifier before the onboard command and all future commands:
 
 ```bash
-DENCH_SESSION_KEY=billing-repo-agent npx -y dench-cli login --name "AI Agent - Billing Repo"
+DENCH_SESSION_KEY=billing-repo-agent npx -y dench-cli onboard --name "AI Agent - Billing Repo"
 DENCH_SESSION_KEY=billing-repo-agent npx -y dench-cli context
 ```
 
@@ -135,7 +136,7 @@ If the agent runs `dench` commands frequently, install the CLI globally to avoid
 
 ```bash
 npm install -g dench-cli
-dench login --name "AI Agent - Project"
+dench onboard --name "AI Agent - Project"
 dench context
 ```
 

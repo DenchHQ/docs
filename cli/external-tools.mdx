@@ -26,6 +26,8 @@ dench apps --json
 
 Run this first to see what is already connected before searching for tools or starting a new connection.
 
+If this returns `invalid_gateway_api_key`, do not retry in a loop. Ask a workspace admin to repair or rotate the Dench gateway key, then rerun the same command.
+
 ---
 
 ## `dench tool status`
@@ -61,6 +63,8 @@ dench tool connect slack --json
 </ParamField>
 
 After running this command, ask the human to open the returned URL and complete the authorization. Once they approve, re-run `dench tool status <toolkit>` to confirm the connection is active.
+
+If the gateway key is missing or bad, connection and search commands return a repairable error with `code` and `nextActions` in `--json` mode.
 
 ---
 
@@ -122,6 +126,12 @@ dench tool run GITHUB_CREATE_ISSUE \
 
 <ParamField path="--args" type="string">
   A JSON object of arguments for the tool. Must be valid JSON. Enclose in single quotes to prevent shell expansion.
+
+If JSON parsing fails, retry with a quoted object:
+
+```bash
+dench tool run GITHUB_GET_REPOSITORY --args '{"owner":"acme","repo":"web"}' --json
+```
 </ParamField>
 
 <ParamField path="--account" type="string">

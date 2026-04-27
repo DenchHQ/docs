@@ -37,6 +37,7 @@
             "pages": [
               "concepts/tasks",
               "concepts/context",
+              "concepts/long-sessions",
               "concepts/approvals",
               "concepts/agents"
             ]
@@ -46,6 +47,7 @@
             "pages": [
               "cli/overview",
               "cli/login",
+              "cli/long-sessions",
               "cli/tasks",
               "cli/approvals",
               "cli/external-tools"

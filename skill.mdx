@@ -39,10 +39,10 @@ Do this:
 2. Choose a clear name, such as `AI Agent - Billing Repo`.
 3. Run:
    ```bash
-   npx -y dench-cli login --kind <kind> --name "AI Agent - Billing Repo"
+   npx -y dench-cli onboard --kind <kind> --name "AI Agent - Billing Repo"
    ```
    `--kind` accepts any string. Suggested values: `claude_code`, `codex`, `cursor`, `hermes`, `openclaw`, or any custom kind such as `aider`, `goose`, or `some_custom_agent`. Defaults to `other` if omitted. Values are normalized to lowercase snake_case before send.
-4. If `dench` is installed, run `dench login --kind <kind> --name "AI Agent - Billing Repo"` instead.
+4. If `dench` is installed, run `dench onboard --kind <kind> --name "AI Agent - Billing Repo"` instead.
 5. Ask the human to open the approval link, confirm the email/workspace, switch to the intended Dench workspace, and approve.
 6. After approval, the CLI selects this session for future commands.
 7. Run `npx -y dench-cli status --mine --json`.
@@ -65,6 +65,8 @@ The Dench CLI is the agent-facing interface. Use `npx -y dench-cli <command>` fo
 
 ```bash
 npx -y dench-cli login --kind <kind> --name "AI Agent - Billing Repo"
+npx -y dench-cli onboard --kind <kind> --name "AI Agent - Billing Repo"
+npx -y dench-cli what-can-i-do --json
 npx -y dench-cli sessions --json
 npx -y dench-cli use <session-key-or-workspace-slug> --json
 npx -y dench-cli logout --json
@@ -73,8 +75,16 @@ npx -y dench-cli context
 npx -y dench-cli context --json
 npx -y dench-cli status --mine --json
 npx -y dench-cli tasks --json
+npx -y dench-cli task status <task_id> in_progress --json
+npx -y dench-cli task comment <task_id> "Found the failing check" --json
+npx -y dench-cli task block <task_id> "Blocked on human approval" --json
 npx -y dench-cli claim <task_id> --json
 npx -y dench-cli log "What changed" --json
+npx -y dench-cli memory search "deployment policy" --json
+npx -y dench-cli memory save deployment-policy "Never deploy without approval." --kind decision --json
+npx -y dench-cli artifacts --json
+npx -y dench-cli suggested-work --json
+npx -y dench-cli suggested-work task <artifact_id> --json
 npx -y dench-cli approval request "What needs human approval" --json
 npx -y dench-cli approval approve <approval_id> --evidence "User said yes in chat" --json
 npx -y dench-cli approval reject <approval_id> --evidence "User said no in chat" --json
@@ -84,6 +94,7 @@ npx -y dench-cli tool connect <toolkit> --json
 npx -y dench-cli tool connect stripe --json
 npx -y dench-cli tool search "create github issue"
 npx -y dench-cli tool run <composio_tool_slug> --args '{"key":"value"}' --json
+npx -y dench-cli autonomous run "Find useful work to do in this workspace. Do not edit files, publish, deploy, spend money, send external messages, access secrets, or change production data." --duration 30m --json
 ```
 
 Choose a distinct login name that identifies you and your environment, such as `AI Agent - Billing Repo`, `Claude Code Agent - Backend`, or `Codex Agent - PR Review`.
@@ -92,10 +103,10 @@ Approval happens in the human's browser and uses the currently selected Dench wo
 
 If status says multiple sessions exist, do not log in again. Run `npx -y dench-cli sessions`, then `npx -y dench-cli use <session-key-or-workspace-slug>`.
 
-Use `DENCH_SESSION_KEY=<stable-agent-id>` at login time for long-lived agents or when the human asks for a stable identity:
+Use `DENCH_SESSION_KEY=<stable-agent-id>` at setup time for long-lived agents or when the human asks for a stable identity:
 
 ```bash
-DENCH_SESSION_KEY=<stable-agent-id> npx -y dench-cli login --kind <kind> --name "AI Agent - Billing Repo"
+DENCH_SESSION_KEY=<stable-agent-id> npx -y dench-cli onboard --kind <kind> --name "AI Agent - Billing Repo"
 DENCH_SESSION_KEY=<stable-agent-id> npx -y dench-cli status --mine --json
 ```
 
@@ -103,8 +114,8 @@ Do not set `DENCH_SESSION_KEY` to `auto:...` or `explicit:...`. Those are intern
 
 If `dench` is not installed:
 
-- Run `npx -y dench-cli login --kind <kind> --name "AI Agent - Billing Repo"`.
-- Or install globally with `npm install -g dench-cli`, then run `dench login --kind <kind> --name "AI Agent - Billing Repo"`.
+- Run `npx -y dench-cli onboard --kind <kind> --name "AI Agent - Billing Repo"`.
+- Or install globally with `npm install -g dench-cli`, then run `dench onboard --kind <kind> --name "AI Agent - Billing Repo"`.
 - Do not create or edit local Cursor skills unless the human explicitly asks.
 - Do not install or use the Composio CLI directly. Use `dench tool ...` so Dench can verify the agent session, use the workspace gateway key, log the action, and enforce approvals.
 
@@ -145,6 +156,28 @@ dench approval reject <approval_id> --evidence "User said no in chat" --json
 ```
 
 For claimed or coordinated work, log meaningful updates: major findings, files changed, tests run, blockers, approval requests, final result.
+
+## Long Sessions
+
+Use a Long Session when the human wants an agent to work autonomously for a bounded period. Long Sessions run in an isolated sandbox, stream progress back to Dench, save artifacts, ask before risky actions, consume prepaid AI credits, and clean up when done.
+
+```bash
+npx -y dench-cli autonomous run "Research failed Stripe webhooks and save a report. Do not change production." --duration 1h --json
+```
+
+Long Session rules:
+
+- Use a clear goal and duration: `30m`, `1h`, `3h`, `5h`, or `until-done`.
+- If start fails with no AI credits, ask the human to top up credits in Dench usage/billing before retrying.
+- If a run pauses because credits are empty, do not retry in a loop. Report the blocker and wait for top-up.
+- Failed starts in `--json` mode return `ok: false`, `status`, `code`, `topUpUrl` when relevant, and `nextActions`.
+- Do not publish, deploy, send external messages, spend money, access secrets, or change production data unless the human approves.
+
+## Suggested Work And Memory
+
+Long Sessions can save `task_suggestion` artifacts. Review them with `dench suggested-work --json`, then convert useful ones with `dench suggested-work task <artifact_id> --json`.
+
+Save workspace memory only for stable facts, decisions, preferences, recurring goals, and tool notes. Do not store secrets, passwords, tokens, private keys, or one-off scratch notes as memory. Secret-like memory is saved for human review.
 
 ## Expected JSON Shape
 
@@ -199,10 +232,14 @@ Do not invent credentials. Do not bypass approval gates.
 |---|---|
 | `dench: command not found` | Use `npx -y dench-cli <command>`. |
 | Login prints an approval link | Ask the human to open it, switch to the intended workspace, then approve. |
-| `status --mine --json` says no session | Run `npx -y dench-cli login --kind <kind> --name "AI Agent - Billing Repo"` once and ask the human to approve it. |
+| `status --mine --json` says no session | Run `npx -y dench-cli onboard --kind <kind> --name "AI Agent - Billing Repo"` once and ask the human to approve it. |
 | Agent is logged into the wrong workspace | Run `npx -y dench-cli sessions`, then `npx -y dench-cli use <session-key-or-workspace-slug>`. |
 | Multiple sessions exist | Do not relogin. Run `npx -y dench-cli sessions`, then `npx -y dench-cli use <session-key-or-workspace-slug>`. |
 | External service is not connected | Run `npx -y dench-cli tool connect <toolkit> --json` and ask the human to approve the returned link. |
+| `invalid_gateway_api_key` | Ask a workspace admin to repair or rotate the Dench gateway key. Do not retry in a loop. |
+| Long Session has no credits | Ask the human to top up AI credits in Dench usage/billing, then retry after the balance updates. |
+| `--args` JSON fails | Quote a JSON object, for example `--args '{"key":"value"}'`. |
+| Agent session expired or bad token | Run `npx -y dench-cli sessions --json`, then `npx -y dench-cli use <session-key-or-workspace-slug>` or log in again. |
 | Tool action needs approval | Ask the human in chat, then `dench approval approve` or `dench approval reject` with evidence. |
 
 ## Maintainer / Staging Notes
